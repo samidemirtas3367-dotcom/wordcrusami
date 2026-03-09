@@ -17,6 +17,7 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --danger: #ef4444;
+            --success: #22c55e;
             --gold: #fbbf24;
         }
 
@@ -25,6 +26,15 @@
             color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             margin: 0; height: 100vh; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- HATA & DOĞRU EFEKTLERİ --- */
+        .wrong-flash { background: var(--danger) !important; animation: shake 0.3s; }
+        .correct-flash { background: var(--success) !important; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
         }
 
         /* --- SCRIPTED MENU SYSTEM --- */
@@ -227,6 +237,8 @@
         bonusActive: false
     };
 
+    let activeGamePool = []; 
+
     // Render 10 Units dynamic Menu
     const unitRoot = document.getElementById('unit-root');
     for (let i = 1; i <= 10; i++) {
@@ -257,6 +269,19 @@
         GAME_STATE.activeCount = 15;
         GAME_STATE.cheatUsed = false;
         GAME_STATE.bonusActive = false;
+        
+        let unitWords = MASTER_DICT[unitId].words;
+        let allWords = [];
+        Object.values(MASTER_DICT).forEach(u => allWords.push(...u.words));
+        
+        activeGamePool = [...unitWords];
+        let attempts = 0;
+        while(activeGamePool.length < 15 && attempts < 100) {
+            let rand = allWords[Math.floor(Math.random()*allWords.length)];
+            if(!activeGamePool.find(x => x.en === rand.en)) activeGamePool.push(rand);
+            attempts++;
+        }
+        
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'flex';
         updateUI();
@@ -267,13 +292,18 @@
         const enG = document.getElementById('en-grid');
         const trG = document.getElementById('tr-grid');
         enG.innerHTML = ''; trG.innerHTML = '';
-        const pool = MASTER_DICT[GAME_STATE.unit].words;
+
+        // --- THE SHUFFLE UPDATE: İki tarafı da birbirinden bağımsız karıştırıyoruz ---
+        let enPool = [...activeGamePool].sort(() => Math.random() - 0.5);
+        let trPool = [...activeGamePool].sort(() => Math.random() - 0.5);
 
         for(let i=0; i<15; i++) {
-            const word = pool[Math.floor(Math.random()*pool.length)];
-            const color = Math.floor(Math.random()*4);
-            enG.appendChild(createTile(word.en, 'en', i, word.en, color));
-            trG.appendChild(createTile(word.tr, 'tr', i, word.en, 'tr'));
+            let enWord = enPool[i];
+            let trWord = trPool[i];
+            
+            let color = Math.floor(Math.random()*4);
+            enG.appendChild(createTile(enWord.en, 'en', i, enWord.en, color));
+            trG.appendChild(createTile(trWord.tr, 'tr', i, trWord.en, 'tr')); // Eşleşme data-pair ile sağlanıyor
         }
         setTimeout(scanForMatch3, 800);
     }
@@ -286,7 +316,6 @@
         div.dataset.pair = pair;
         div.dataset.color = col;
         div.onclick = () => onTileClick(div);
-        // Special class logic for TR tiles to avoid accidental coloration
         div.className = `tile falling ${col === 'tr' ? 'tr-tile' : 'c-'+col}`;
         return div;
     }
@@ -307,12 +336,15 @@
     function checkPair() {
         const en = GAME_STATE.selectedEN;
         const tr = GAME_STATE.selectedTR;
+        // İki eşin data-pair değerine bakarak doğruluğunu kontrol et
         if(en.dataset.pair === tr.dataset.pair && en.dataset.pair !== "") {
             GAME_STATE.score += 100;
             updateUI();
-            // MANUAL MATCH: SADECE TEMİZLE (YENİ KELİME GELMEZ)
-            removeTiles([en, tr], false);
+            showFeedback("CORRECT!", "correct-flash");
+            // Sadece EN gönderiyoruz, TR eşini data-pair'den bulup silecek
+            removeTiles([en], false);
         } else {
+            showFeedback("WRONG MATCH!", "wrong-flash");
             en.classList.remove('active-sel');
             tr.classList.remove('active-sel');
         }
@@ -320,14 +352,26 @@
         GAME_STATE.selectedTR = null;
     }
 
+    function showFeedback(txt, cls) {
+        let p = document.getElementById('msg-popup');
+        if (!p) {
+            p = document.createElement('div');
+            p.id = 'msg-popup';
+            p.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); font-size:45px; font-weight:900; z-index:9000; text-shadow:0 5px 15px #000; background:rgba(0,0,0,0.8); padding:15px 40px; border-radius:50px;";
+            document.body.appendChild(p);
+        }
+        p.innerText = txt; p.style.display = 'block'; p.style.color = (cls==="correct-flash") ? "#22c55e" : "#ef4444";
+        document.body.classList.add(cls);
+        setTimeout(() => { p.style.display = 'none'; document.body.classList.remove(cls); }, 500);
+    }
+
     // BONUS LOGIC: Match-3 trigger
     function scanForMatch3() {
-        if(GAME_STATE.bonusActive) return; // Prevent cascading loops if unnecessary
+        if(GAME_STATE.bonusActive) return;
 
         const tiles = Array.from(document.querySelectorAll('#en-grid .tile'));
         let matchSet = new Set();
 
-        // Horizontal Scan (r=rows)
         for(let r=0; r<5; r++) {
             let i1=r*3, i2=r*3+1, i3=r*3+2;
             let c1=tiles[i1]?.dataset.color, c2=tiles[i2]?.dataset.color, c3=tiles[i3]?.dataset.color;
@@ -335,7 +379,6 @@
                 matchSet.add(tiles[i1]); matchSet.add(tiles[i2]); matchSet.add(tiles[i3]);
             }
         }
-        // Vertical Scan (c=columns)
         for(let c=0; c<3; c++) {
             for(let r=0; r<=2; r++) {
                 let t1=tiles[r*3+c], t2=tiles[(r+1)*3+c], t3=tiles[(r+2)*3+c];
@@ -347,37 +390,32 @@
         }
 
         if(matchSet.size > 0) {
-            GAME_STATE.score += 500; // Large bonus
+            GAME_STATE.score += 500;
             flashBonus();
             updateUI();
             GAME_STATE.bonusActive = true;
-            // MATCH-3 SPECIAL: REGENERATE TILES (shouldRegen = true)
             removeTiles(Array.from(matchSet), true);
         }
     }
 
     function removeTiles(list, shouldRegen) {
         list.forEach(t => {
-            const pairTR = document.querySelector(`#tr-grid .tile[data-index="${t.dataset.index}"]`);
+            // EŞLEŞTİRME MANTIĞI: data-pair özelliğini kullanarak eşini bul
+            const pairTR = document.querySelector(`#tr-grid .tile[data-pair="${t.dataset.pair}"]`);
             
-            // FIRE POP ANIMATION if shouldRegen
             t.className += (shouldRegen) ? ' fire-pop' : ' pop'; 
             if(pairTR) pairTR.className += (shouldRegen) ? ' fire-pop' : ' pop';
             
             setTimeout(() => {
                 if(!shouldRegen) {
-                    // Manual Clear (no regrowth)
                     t.style.visibility = 'hidden'; 
-                    t.dataset.color = 'none'; t.dataset.pair = ""; // Mark as inactive
+                    t.dataset.color = 'none'; t.dataset.pair = ""; 
                     if(pairTR) { pairTR.style.visibility = 'hidden'; pairTR.dataset.pair = ""; }
                     
                     GAME_STATE.activeCount = document.querySelectorAll('#en-grid .tile:not([style*="visibility: hidden"])').length;
-                    // Trigger final screen if all clear
-                    if(document.querySelectorAll('#en-grid .tile:not([style*="visibility: hidden"])').length === 0) triggerFinal(false);
+                    if(GAME_STATE.activeCount === 0) triggerFinal(false);
                 } else {
-                    // Match-3 Bonus Regeneration
-                    const pool = MASTER_DICT[GAME_STATE.unit].words;
-                    const nw = pool[Math.floor(Math.random()*pool.length)];
+                    const nw = activeGamePool[Math.floor(Math.random()*activeGamePool.length)];
                     const nc = Math.floor(Math.random()*4);
                     
                     t.innerText = nw.en; t.dataset.pair = nw.en; t.dataset.color = nc;
