@@ -134,7 +134,9 @@
         .falling { animation: fallIn 0.5s ease-out forwards; }
         .fire-pop { animation: fire-glow 0.4s alternate infinite, popOut 0.4s forwards; border: 4px solid red; }
 
-        #toast { position: fixed; top: 30%; font-size: 60px; font-weight: 900; color: gold; display: none; z-index: 5000; text-shadow: 0 0 20px #000; }
+        #toast, #msg-popup { position: fixed; top: 30%; font-weight: 900; display: none; z-index: 5000; text-shadow: 0 0 20px #000; text-align: center; }
+        #toast { font-size: 60px; color: gold; }
+        #msg-popup { font-size: 45px; }
 
         /* END GAME MODALS */
         .end-screen {
@@ -151,7 +153,7 @@
 <div id="menu-screen">
     <div class="menu-header">
         <h1 class="menu-title">WORD CRUSH PRO</h1>
-        <span class="menu-sub">MEB 6. Sınıf Spring English Project</span>
+        <span class="menu-sub">MEB 6. Sınıf Elite English Project</span>
     </div>
 
     <div class="card-container" id="unit-root"></div>
@@ -209,6 +211,48 @@
 </div>
 
 <script>
+    /* ========================================
+       AUDIO ENGINE - İNTERNET ÜZERİNDEN SESLER
+       ========================================
+    */
+    const AUDIO_FILES = {
+        classic: {
+            correct: 'https://actions.google.com/sounds/v1/water/splash.ogg', 
+            wrong: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
+            bonus: 'https://actions.google.com/sounds/v1/cartoon/conga_drum_hit.ogg',
+            win: 'https://actions.google.com/sounds/v1/human_voices/applause.ogg'
+        },
+        cs2: {
+            correct: 'https://actions.google.com/sounds/v1/weapons/firework_rocket_launch.ogg',
+            wrong: 'https://actions.google.com/sounds/v1/alarms/digital_alarm_clock.ogg',
+            bonus: 'https://actions.google.com/sounds/v1/weapons/automatic_gun_fire.ogg',
+            win: 'https://actions.google.com/sounds/v1/science_fiction/low_fuzz_explosion.ogg'
+        },
+        subnautica: {
+            correct: 'https://actions.google.com/sounds/v1/water/bubbles_liquid.ogg',
+            wrong: 'https://actions.google.com/sounds/v1/alarms/sonar_ping.ogg',
+            bonus: 'https://actions.google.com/sounds/v1/water/water_splash.ogg',
+            win: 'https://actions.google.com/sounds/v1/ambient/ocean_surf.ogg'
+        }
+    };
+
+    function playSound(actionType) {
+        let theme = GAME_STATE.theme;
+        let themeGroup = AUDIO_FILES[theme] || AUDIO_FILES['classic'];
+        let soundSrc = themeGroup[actionType];
+
+        if (soundSrc) {
+            let sfx = new Audio(soundSrc);
+            sfx.volume = 0.5;
+            let playPromise = sfx.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Ses oynatılamadı, kullanıcı tıklaması bekleniyor.");
+                });
+            }
+        }
+    }
+
     /* ========================================
        GAME ENGINE DATA & LOGIC
        ========================================
@@ -340,10 +384,12 @@
         if(en.dataset.pair === tr.dataset.pair && en.dataset.pair !== "") {
             GAME_STATE.score += 100;
             updateUI();
+            playSound('correct');
             showFeedback("CORRECT!", "correct-flash");
             // Sadece EN gönderiyoruz, TR eşini data-pair'den bulup silecek
             removeTiles([en], false);
         } else {
+            playSound('wrong');
             showFeedback("WRONG MATCH!", "wrong-flash");
             en.classList.remove('active-sel');
             tr.classList.remove('active-sel');
@@ -391,6 +437,7 @@
 
         if(matchSet.size > 0) {
             GAME_STATE.score += 500;
+            playSound('bonus');
             flashBonus();
             updateUI();
             GAME_STATE.bonusActive = true;
@@ -434,8 +481,8 @@
     function execCheat() {
         if(GAME_STATE.cheatUsed) return;
         const input = document.getElementById('cheat-input').value;
-        if(input === 'LETSBEGİN_' && GAME_STATE.theme === 'alastor') { GAME_STATE.score += 4000; GAME_STATE.cheatUsed = true; }
-        if(input === 'VOXTEK_' && GAME_STATE.theme === 'vox') { GAME_STATE.score += 1000; GAME_STATE.cheatUsed = true; }
+        if(input === 'LETSBEGİN_' && GAME_STATE.theme === 'alastor') { GAME_STATE.score += 4000; GAME_STATE.cheatUsed = true; playSound('bonus'); }
+        if(input === 'VOXTEK_' && GAME_STATE.theme === 'vox') { GAME_STATE.score += 1000; GAME_STATE.cheatUsed = true; playSound('bonus'); }
         updateUI(); document.getElementById('cheat-input').value = '';
     }
 
@@ -452,6 +499,7 @@
     }
 
     function triggerFinal(isManualFinish) {
+        playSound('win');
         const screen = document.getElementById('end-screen');
         const h = document.getElementById('end-header');
         const q = document.getElementById('end-quote');
@@ -470,6 +518,9 @@
         } else if(GAME_STATE.theme === 'subnautica') {
             h.innerText = "FAREWELL... 🌊";
             q.innerText = '"We are different. But we go... together. To the stars."';
+        } else {
+            h.innerText = "WELL DONE! 🏆";
+            q.innerText = '"The future belongs to those who learn."';
         }
 
         screen.style.display = 'flex';
