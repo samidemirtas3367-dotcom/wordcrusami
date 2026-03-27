@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -159,7 +159,7 @@
         
         .gravity-fall { animation: gravityDrop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .pop { animation: popOut 0.4s forwards; pointer-events: none; }
-        .fire-pop { animation: fire-glow 0.4s alternate infinite, popOut 0.4s forwards; border: 4px solid red; }
+        .fire-pop { animation: fire-glow 0.4s alternate infinite, popOut 0.4s forwards; border: 4px solid red; z-index: 200; }
 
         #toast, #msg-popup { position: fixed; top: 30%; font-weight: 900; display: none; z-index: 5000; text-shadow: 0 0 20px #000; text-align: center; }
         #toast { font-size: 60px; color: gold; }
@@ -244,7 +244,7 @@
     <div class="scoreboard">
         <div class="stat-box"><span class="stat-lbl">Ünite</span><span id="wm-unit" class="stat-val">1</span></div>
         <div class="stat-box"><span class="stat-lbl">Skor</span><span id="wm-score" class="stat-val">0</span></div>
-        <div class="stat-box"><span class="stat-lbl">Kalan</span><span id="wm-tiles" class="stat-val">15</span></div>
+        <div class="stat-box"><span class="stat-lbl">Kalan Eş</span><span id="wm-tiles" class="stat-val">15</span></div>
     </div>
     <div class="game-world">
         <div class="grid-wrap"><h3>İNGİLİZCE</h3><div id="en-grid" class="game-grid"></div></div>
@@ -303,7 +303,7 @@
     </div>
 </div>
 
-<div id="toast">MATCH-3 BONUS!</div>
+<div id="toast">BONUS COMBO!</div>
 <div id="end-screen" class="end-screen">
     <h1 id="end-header" class="end-title">TEBRİKLER!</h1>
     <p id="end-quote" class="end-quote">"Öğrenenlerin geleceği parlaktır."</p>
@@ -330,7 +330,7 @@
     };
 
     let GAME_STATE = {
-        mode: '', // 'wordmatch', 'quiz', veya 'battle'
+        mode: '', 
         unit: 1,
         theme: 'classic',
         device: 'pc',
@@ -351,13 +351,13 @@
     let BATTLE_Q = null;
 
     /* ========================================
-       SES MOTORU
+       SES MOTORU (Bonus Sesi Eklendi)
        ========================================
     */
     const AUDIO_FILES = {
-        classic: { correct: 'https://actions.google.com/sounds/v1/water/splash.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', win: 'https://actions.google.com/sounds/v1/human_voices/applause.ogg' },
-        cs2: { correct: 'https://actions.google.com/sounds/v1/weapons/firework_rocket_launch.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/digital_alarm_clock.ogg', win: 'https://actions.google.com/sounds/v1/science_fiction/low_fuzz_explosion.ogg' },
-        subnautica: { correct: 'https://actions.google.com/sounds/v1/water/bubbles_liquid.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/sonar_ping.ogg', win: 'https://actions.google.com/sounds/v1/ambient/ocean_surf.ogg' }
+        classic: { correct: 'https://actions.google.com/sounds/v1/water/splash.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', win: 'https://actions.google.com/sounds/v1/human_voices/applause.ogg', bonus: 'https://actions.google.com/sounds/v1/cartoon/conga_drum_hit.ogg' },
+        cs2: { correct: 'https://actions.google.com/sounds/v1/weapons/firework_rocket_launch.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/digital_alarm_clock.ogg', win: 'https://actions.google.com/sounds/v1/science_fiction/low_fuzz_explosion.ogg', bonus: 'https://actions.google.com/sounds/v1/weapons/automatic_gun_fire.ogg' },
+        subnautica: { correct: 'https://actions.google.com/sounds/v1/water/bubbles_liquid.ogg', wrong: 'https://actions.google.com/sounds/v1/alarms/sonar_ping.ogg', win: 'https://actions.google.com/sounds/v1/ambient/ocean_surf.ogg', bonus: 'https://actions.google.com/sounds/v1/water/water_splash.ogg' }
     };
 
     function playSound(actionType) {
@@ -369,6 +369,14 @@
             let p = sfx.play();
             if(p !== undefined) p.catch(() => {});
         }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        t.style.animation = 'popOut 1.5s forwards';
+        setTimeout(() => { t.style.display = 'none'; t.style.animation = ''; }, 1500);
     }
 
     /* ========================================
@@ -390,7 +398,6 @@
         showScreen('main-menu');
     }
 
-    // Üniteleri Render Et
     const unitRoot = document.getElementById('unit-root');
     for (let i = 1; i <= 10; i++) {
         if(!MASTER_DICT[i]) continue;
@@ -447,6 +454,7 @@
             GAME_STATE.activeCount = 15;
             GAME_STATE.enData = null;
             GAME_STATE.trData = null;
+            GAME_STATE.bonusActive = false;
             activeGamePool = [];
             let attempts = 0;
             while(activeGamePool.length < 15 && attempts < 100) {
@@ -457,6 +465,7 @@
             showScreen('game-screen');
             updateWMUI();
             buildGrids();
+            setTimeout(scanForBonus, 800);
         } 
         else if (GAME_STATE.mode === 'quiz') {
             let unitWords = MASTER_DICT[unitId].words;
@@ -601,7 +610,7 @@
     }
 
     /* ========================================
-       WORD MATCH MOTORU (YERÇEKİMİ İLE BİRLİKTE)
+       WORD MATCH MOTORU (BONUS & L-SHAPE EKLENTİSİ)
        ========================================
     */
     function buildGrids() {
@@ -631,7 +640,7 @@
             div.innerText = type === 'en' ? word.en : word.tr;
             div.dataset.index = i;
             div.dataset.type = type;
-            div.dataset.pair = word.en;
+            div.dataset.pair = word.pair !== undefined ? word.pair : word.en;
             div.dataset.color = type === 'tr' ? 'tr' : color;
             div.onclick = () => onTileClick(div);
             div.className = `tile ${type === 'tr' ? 'tr-tile' : 'c-'+color}`;
@@ -645,6 +654,8 @@
 
     function onTileClick(tile) {
         if(tile.style.visibility === 'hidden') return;
+        if(GAME_STATE.bonusActive) return;
+
         if(tile.dataset.type === 'en') {
             if(GAME_STATE.selectedEN) GAME_STATE.selectedEN.classList.remove('active-sel');
             GAME_STATE.selectedEN = tile;
@@ -690,7 +701,11 @@
             
             GAME_STATE.activeCount--;
             updateWMUI();
-            if(GAME_STATE.activeCount <= 0) triggerFinal(false);
+            if(GAME_STATE.activeCount <= 0) {
+                triggerFinal(false);
+            } else {
+                scanForBonus(); 
+            }
         }, 400);
     }
 
@@ -719,6 +734,125 @@
         });
     }
 
+    /* --- YENİ BONUS VE DOLDURMA SİSTEMİ --- */
+    function scanForBonus() {
+        if (GAME_STATE.mode !== 'wordmatch') return;
+        if (GAME_STATE.bonusActive) return;
+
+        let enData = GAME_STATE.enData;
+        if (!enData) return;
+
+        let matchSet = new Set(); 
+
+        for (let r = 0; r < 5; r++) {
+            let i1 = r * 3, i2 = r * 3 + 1, i3 = r * 3 + 2;
+            let d1 = enData[i1], d2 = enData[i2], d3 = enData[i3];
+            if (d1 && d2 && d3 && d1.color === d2.color && d2.color === d3.color) {
+                matchSet.add(i1); matchSet.add(i2); matchSet.add(i3);
+            }
+        }
+
+        for (let c = 0; c < 3; c++) {
+            for (let r = 0; r <= 2; r++) {
+                let i1 = r * 3 + c, i2 = (r + 1) * 3 + c, i3 = (r + 2) * 3 + c;
+                let d1 = enData[i1], d2 = enData[i2], d3 = enData[i3];
+                if (d1 && d2 && d3 && d1.color === d2.color && d2.color === d3.color) {
+                    matchSet.add(i1); matchSet.add(i2); matchSet.add(i3);
+                }
+            }
+        }
+
+        if (matchSet.size >= 3) {
+            GAME_STATE.bonusActive = true;
+            GAME_STATE.score += 500;
+            playSound('bonus');
+            showToast("BONUS COMBO!");
+
+            let enIndices = Array.from(matchSet);
+            let trIndices = [];
+
+            enIndices.forEach(enIdx => {
+                let pairWord = enData[enIdx].pair;
+                let trIdx = GAME_STATE.trData.findIndex((t, idx) => t && t.pair === pairWord && !trIndices.includes(idx));
+                if(trIdx !== -1) trIndices.push(trIdx);
+            });
+
+            enIndices.forEach(idx => {
+                let tile = document.querySelector(`#en-grid .tile[data-index="${idx}"]`);
+                if(tile) tile.classList.add('fire-pop');
+                GAME_STATE.enData[idx] = null;
+            });
+            trIndices.forEach(idx => {
+                let tile = document.querySelector(`#tr-grid .tile[data-index="${idx}"]`);
+                if(tile) tile.classList.add('fire-pop');
+                GAME_STATE.trData[idx] = null;
+            });
+
+            setTimeout(() => {
+                let allWords = [];
+                Object.values(MASTER_DICT).forEach(u => allWords.push(...u.words));
+                
+                let newPairsEn = [];
+                let newPairsTr = [];
+                for(let i = 0; i < enIndices.length; i++) {
+                    let w = allWords[Math.floor(Math.random() * allWords.length)];
+                    let c = Math.floor(Math.random() * 4);
+                    newPairsEn.push({ en: w.en, tr: w.tr, pair: w.en, color: c });
+                    newPairsTr.push({ en: w.en, tr: w.tr, pair: w.en, color: 'tr' });
+                }
+
+                applyGravityWithRefill('en', newPairsEn);
+                applyGravityWithRefill('tr', newPairsTr);
+                updateWMUI();
+
+                setTimeout(() => {
+                    GAME_STATE.bonusActive = false;
+                    scanForBonus(); 
+                }, 600);
+
+            }, 400);
+        }
+    }
+
+    function applyGravityWithRefill(type, newPairsQueue) {
+        let data = GAME_STATE[type + 'Data'];
+        let queue = [...newPairsQueue];
+
+        for (let col = 0; col < 3; col++) {
+            let emptySpots = [];
+            for (let row = 4; row >= 0; row--) {
+                let i = row * 3 + col;
+                if (data[i] === null) {
+                    emptySpots.push(i);
+                } else if (emptySpots.length > 0) {
+                    let nextEmpty = emptySpots.shift();
+                    data[nextEmpty] = data[i];
+                    data[i] = null;
+                    emptySpots.push(i);
+                }
+            }
+            emptySpots.forEach(idx => {
+                if(queue.length > 0) {
+                    let p = queue.shift();
+                    if (type === 'en') {
+                        data[idx] = { en: p.en, tr: p.tr, pair: p.pair, color: p.color };
+                    } else {
+                        data[idx] = { en: p.en, tr: p.tr, pair: p.pair, color: 'tr' };
+                    }
+                }
+            });
+        }
+        
+        renderGrid(type + '-grid', type);
+        
+        const container = document.getElementById(type + '-grid');
+        Array.from(container.children).forEach(child => {
+            child.classList.remove('gravity-fall');
+            void child.offsetWidth;
+            child.classList.add('gravity-fall');
+        });
+    }
+
     function updateWMUI() {
         document.getElementById('wm-unit').innerText = GAME_STATE.unit;
         document.getElementById('wm-score').innerText = GAME_STATE.score;
@@ -737,10 +871,35 @@
         setTimeout(() => p.style.display = 'none', 500);
     }
 
+    /* ========================================
+       TEMA/MOD ÖZEL BİTİRİŞ EKRANI
+       ========================================
+    */
     function triggerFinal(isManualFinish) {
         playSound('win');
         const screen = document.getElementById('end-screen');
+        const h = document.getElementById('end-header');
+        const q = document.getElementById('end-quote');
         document.getElementById('end-score').innerText = GAME_STATE.score;
+
+        if(GAME_STATE.theme === 'alastor') {
+            h.innerText = "THE SHOW IS OVER! 📻";
+            q.innerText = '"Smile, my dear! You know you are never fully dressed without one!"';
+        } else if(GAME_STATE.theme === 'vox') {
+            h.innerText = "VOXTEK SECURE! 📺";
+            q.innerText = '"Trust us with your future! The technology of tomorrow, today."';
+        } else if(GAME_STATE.theme === 'cs2') {
+            const ct = Math.random() > 0.5;
+            h.innerText = ct ? "COUNTER-TERRORISTS WIN 💣" : "TERRORISTS WIN 💥";
+            q.innerText = ct ? "Bomb defused. Good work team." : "Target destroyed. Mission accomplished.";
+        } else if(GAME_STATE.theme === 'subnautica') {
+            h.innerText = "FAREWELL... 🌊";
+            q.innerText = '"We are different. But we go... together. To the stars."';
+        } else {
+            h.innerText = "TEBRİKLER! 🏆";
+            q.innerText = '"Öğrenenlerin geleceği parlaktır."';
+        }
+
         screen.style.display = 'flex';
     }
 </script>
