@@ -64,7 +64,7 @@
         /* --- MENÜ SİSTEMİ EKRANLARI --- */
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; padding-top: 40px; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(25px); overflow-y: auto; z-index: 10; }
         #main-menu { display: flex; z-index: 20; }
-        #game-screen, #quiz-screen, #battle-screen, #bomb-screen, #memory-screen, #rain-screen, #wheel-screen, #voltage-screen, #crate-screen { background: transparent; backdrop-filter: none; z-index: 5; }
+        #game-screen, #quiz-screen, #battle-screen, #bomb-screen, #memory-screen, #rain-screen, #wheel-screen, #voltage-screen, #crate-screen, #air-screen, #tunnel-screen, #chem-screen { background: transparent; backdrop-filter: none; z-index: 5; }
 
         .menu-header { text-align: center; margin-bottom: 30px; animation: slideDown 0.5s ease; }
         @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -82,6 +82,7 @@
 
         .minigame-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 900px; }
         .locked-game { opacity: 0.4; cursor: not-allowed; border-color: #475569 !important; color: #94a3b8 !important; }
+        /* V3.0 KİLİT AÇILMA STİLİ */
         .unlocked-game { opacity: 1 !important; border-color: var(--success) !important; color: var(--success) !important; cursor: pointer !important; text-shadow: 0 0 10px var(--success); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
 
         /* ÜNİTE KARTLARI & MODLAR */
@@ -198,6 +199,43 @@
         .crate-broken { background: transparent !important; border: none !important; box-shadow: none !important; pointer-events: none; animation: popOut 0.5s forwards; color: var(--gold); font-size: 50px; text-shadow: 0 0 30px var(--gold); }
         .crate-q { position: absolute; top: -90px; width: 100%; text-align: center; font-size: 45px; color: var(--gold); font-weight: 900; text-shadow: 0 0 25px #000; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 10px; }
 
+        /* ========================================
+           V3.0 OYUNLARI STİLLERİ (YENİ)
+           ======================================== */
+        
+        /* AIR DROP */
+        #air-screen { background: linear-gradient(to bottom, #0f172a 0%, #000 100%); overflow: hidden; }
+        .air-target-box { background: rgba(0,0,0,0.8); border: 4px solid #f59e0b; padding: 20px 40px; border-radius: 20px; font-size: 40px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #f59e0b; margin-top: 50px; z-index: 100; }
+        .air-crate { position: absolute; width: 160px; height: 160px; background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), #b45309; border: 6px solid #78350f; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #fff; text-shadow: 2px 2px 4px #000; cursor: pointer; box-shadow: 0 15px 25px rgba(0,0,0,0.8); transition: transform 0.1s; z-index: 50; }
+        .air-crate:hover { filter: brightness(1.2); transform: scale(1.05); }
+        .parachute { position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 100px; height: 60px; background: #ef4444; border-radius: 50px 50px 0 0; }
+        .parachute::before, .parachute::after { content: ''; position: absolute; width: 2px; height: 40px; background: #fff; bottom: -40px; }
+        .parachute::before { left: 20px; transform: rotate(20deg); } .parachute::after { right: 20px; transform: rotate(-20deg); }
+        @keyframes airdropFall { to { top: 120vh; } }
+
+        /* GRAVITY TUNNEL */
+        #tunnel-screen { background: #000; perspective: 1000px; overflow: hidden; }
+        .tunnel-bg { position: absolute; inset: 0; background: repeating-radial-gradient(circle at center, transparent 0, transparent 40px, rgba(56, 189, 248, 0.1) 41px, rgba(56, 189, 248, 0.1) 50px); animation: tunnelMove 2s linear infinite; z-index: 1; }
+        @keyframes tunnelMove { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(2); opacity: 1; } }
+        .tunnel-q { position: absolute; top: 15%; width: 80%; text-align: center; font-size: 50px; color: #fff; font-weight: 900; z-index: 100; text-shadow: 0 0 20px var(--accent); background: rgba(0,0,0,0.5); padding: 20px; border-radius: 20px; border: 2px solid var(--accent); }
+        .tunnel-doors { display: flex; gap: 40px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
+        .t-door { width: 200px; height: 300px; background: rgba(15, 23, 42, 0.9); border: 8px solid #64748b; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: #fff; cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 50px #000, 0 0 30px var(--accent); animation: doorApproach 0.5s ease-out forwards; }
+        .t-door:hover { border-color: var(--accent); transform: scale(1.1); box-shadow: 0 0 50px var(--accent); }
+        @keyframes doorApproach { 0% { transform: scale(0.1) translateZ(-1000px); opacity: 0; } 100% { transform: scale(1) translateZ(0); opacity: 1; } }
+
+        /* CHEM REACTION */
+        #chem-screen { background: radial-gradient(circle, #064e3b 0%, #000 100%); }
+        .chem-table { display: flex; flex-direction: column; align-items: center; margin-top: 50px; width: 100%; }
+        .beaker { width: 150px; height: 200px; border: 6px solid #cbd5e1; border-top: none; border-radius: 0 0 40px 40px; position: relative; display: flex; align-items: flex-end; justify-content: center; background: rgba(255,255,255,0.05); margin-bottom: 50px; box-shadow: inset 0 -20px 50px rgba(0,0,0,0.5); }
+        .beaker-liquid { width: 100%; height: 30%; background: #10b981; border-radius: 0 0 34px 34px; transition: height 0.5s, background 0.5s; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #000; }
+        .chem-q { font-size: 40px; color: #fff; font-weight: 900; margin-bottom: 40px; text-shadow: 0 0 20px #10b981; background: rgba(0,0,0,0.5); padding: 15px 40px; border-radius: 20px; border: 2px solid #10b981; }
+        .flasks { display: flex; gap: 40px; }
+        .flask { width: 100px; height: 140px; background: rgba(255,255,255,0.1); border: 4px solid #94a3b8; border-radius: 50px 50px 20px 20px; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; transition: 0.3s; overflow: hidden; }
+        .flask::before { content:''; position: absolute; bottom: 0; width: 100%; height: 60%; background: var(--minigame-accent); z-index: -1; }
+        .flask:hover { transform: translateY(-15px) rotate(15deg); border-color: #fff; }
+        @keyframes explosionChem { 0% { transform: scale(1); background: #fff; } 50% { transform: scale(5); background: #10b981; } 100% { transform: scale(1); opacity: 0; } }
+        @keyframes badExplosion { 0% { transform: scale(1); background: #fff; } 50% { transform: scale(5); background: #ef4444; } 100% { transform: scale(1); opacity: 0; } }
+
         /* --- EFFECTS & MODALS --- */
         .win-flash { animation: winGlow 0.5s infinite alternate; } @keyframes winGlow { from { box-shadow: inset 0 0 50px rgba(34, 197, 94, 0.5); } to { box-shadow: inset 0 0 100px var(--success); } }
         .wrong-flash { background: var(--danger) !important; animation: shake 0.3s; border-color: #fff !important; }
@@ -226,7 +264,7 @@
     </div>
 </div>
 
-<div class="dev-trigger" onclick="toggleConsole()">v2.0.1_build(849)</div>
+<div class="dev-trigger" onclick="toggleConsole()">v3.0.0_build(912)</div>
 
 <div id="main-menu" class="screen">
     <div class="menu-header">
@@ -244,7 +282,7 @@
     </div>
 
     <button class="big-btn" onclick="showScreen('mode-menu')">▶ KLASİK MODLAR</button>
-    <button class="big-btn" onclick="showScreen('minigames-menu')" style="border-color: var(--minigame-accent); color: var(--minigame-accent); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);">🎮 MİNİGAMES (9)</button>
+    <button class="big-btn" onclick="showScreen('minigames-menu')" style="border-color: var(--minigame-accent); color: var(--minigame-accent); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);">🎮 MİNİGAMES (12)</button>
     <button class="big-btn" onclick="showScreen('mods-menu')">🎨 TEMALAR</button>
     <button class="big-btn" onclick="showScreen('settings-menu')">⚙️ AYARLAR</button>
 </div>
@@ -267,9 +305,9 @@
         <button class="big-btn" style="width:100%; font-size: 18px; border-color: #00ffff; color: #00ffff;" onclick="selectMinigame('voltage')">⚡ VOLTAGE CUT</button>
         <button class="big-btn" style="width:100%; font-size: 18px; border-color: #d97706; color: #d97706;" onclick="selectMinigame('crate')">📦 CRATE BREAKER</button>
         
-        <button class="big-btn locked-game" id="mg-air" data-id="air" data-realname="📡 AIR DROP SCAN" style="width:100%; font-size: 18px;">🔒 KİLİTLİ (V3.0)</button>
-        <button class="big-btn locked-game" id="mg-tun" data-id="tunnel" data-realname="🚀 GRAVITY TUNNEL" style="width:100%; font-size: 18px;">🔒 KİLİTLİ (V3.0)</button>
-        <button class="big-btn locked-game" id="mg-chem" data-id="chem" data-realname="🧪 CHEM REACTION" style="width:100%; font-size: 18px; grid-column: span 2;">🔒 KİLİTLİ (V3.0) - GOLD NOVA OL</button>
+        <button class="big-btn locked-game" id="mg-air" data-id="air" data-realname="📡 AIR DROP SCAN" style="width:100%; font-size: 18px;" onclick="if(this.classList.contains('unlocked-game')) selectMinigame('air')">🔒 KİLİTLİ (V3.0)</button>
+        <button class="big-btn locked-game" id="mg-tun" data-id="tunnel" data-realname="🚀 GRAVITY TUNNEL" style="width:100%; font-size: 18px;" onclick="if(this.classList.contains('unlocked-game')) selectMinigame('tunnel')">🔒 KİLİTLİ (V3.0)</button>
+        <button class="big-btn locked-game" id="mg-chem" data-id="chem" data-realname="🧪 CHEM REACTION" style="width:100%; font-size: 18px; grid-column: span 2;" onclick="if(this.classList.contains('unlocked-game')) selectMinigame('chem')">🔒 KİLİTLİ (V3.0) - GOLD NOVA OL</button>
     </div>
     <button class="big-btn back-btn" onclick="showScreen('main-menu')">GERİ DÖN</button>
 </div>
@@ -430,6 +468,32 @@
     </div>
 </div>
 
+<div id="air-screen" class="screen">
+    <div class="ui-top"><button class="nav-btn btn-exit" onclick="resetGame()">ÇIKIŞ</button></div>
+    <div class="scoreboard" style="margin-top: 10px; width: 60%;">
+        <div class="stat-box"><span class="stat-lbl">Hedef Bulundu</span><span id="air-score-ui" class="stat-val">0/5</span></div>
+    </div>
+    <div class="air-target-box" id="air-target-ui">Sinyal Aranıyor...</div>
+    <div id="air-zone" style="position: absolute; top: 200px; left: 0; width: 100%; height: calc(100vh - 200px);"></div>
+</div>
+
+<div id="tunnel-screen" class="screen">
+    <div class="ui-top"><button class="nav-btn btn-exit" onclick="resetGame()">ÇIKIŞ</button></div>
+    <div class="tunnel-bg"></div>
+    <div class="tunnel-q" id="tunnel-q-ui">Soru Yükleniyor...</div>
+    <div class="tunnel-doors" id="tunnel-doors-area"></div>
+</div>
+
+<div id="chem-screen" class="screen">
+    <div class="ui-top"><button class="nav-btn btn-exit" onclick="resetGame()">ÇIKIŞ</button></div>
+    <div class="menu-header" style="margin-top:20px; margin-bottom:10px;"><h1 class="menu-title" style="color:#10b981; font-size:40px;">CHEM REACTION</h1></div>
+    <div class="chem-table">
+        <div class="chem-q" id="chem-q-ui">Analiz Ediliyor...</div>
+        <div class="beaker" id="chem-beaker"><div class="beaker-liquid" id="chem-liquid"></div></div>
+        <div class="flasks" id="chem-flasks-area"></div>
+    </div>
+</div>
+
 <div id="toast">BONUS COMBO!</div>
 <div id="end-screen" class="end-screen">
     <h1 id="end-header" class="end-title">TEBRİKLER!</h1>
@@ -539,7 +603,6 @@
             el.classList.remove('locked-game'); 
             el.classList.add('unlocked-game');
             el.innerText = el.dataset.realname; 
-            el.onclick = () => { alert("Bu oyun V3.0 için hazırlanıyor, Rank açılışı başarılı!"); }; 
         });
         printConsole("Rank Threshold Hit. All restricted modules unlocked automatically.", "success-msg");
     }
@@ -652,6 +715,10 @@
         clearInterval(BOMB_STATE.interval); clearInterval(RAIN_STATE.interval); clearInterval(RAIN_STATE.spawnInterval);
         RAIN_STATE.fallingDivs.forEach(d => { if(d && d.parentNode) d.parentNode.removeChild(d); }); RAIN_STATE.fallingDivs = [];
         WHEEL_STATE.isSpinning = false; VOLTAGE_STATE.isDragging = false;
+        
+        // V3 clear intervals if any
+        if(window.v3AirInterval) clearTimeout(window.v3AirInterval);
+        
         showScreen('main-menu');
     }
 
@@ -687,6 +754,10 @@
             else if(MINIGAME.id === 'rain') startWordRain(uWords);
             else if(MINIGAME.id === 'voltage') startVoltageCut(uWords, aWords);
             else if(MINIGAME.id === 'crate') startCrateBreaker(uWords, aWords);
+            // V3 YENİ EKLENEN OYUNLARIN YÖNLENDİRMESİ:
+            else if(MINIGAME.id === 'air') startAirDrop(uWords, aWords);
+            else if(MINIGAME.id === 'tunnel') startTunnel(uWords, aWords);
+            else if(MINIGAME.id === 'chem') startChem(uWords, aWords);
             return;
         }
 
@@ -702,6 +773,128 @@
             GAME_STATE.scoreP1 = 0; GAME_STATE.scoreP2 = 0; document.getElementById('p1-score-ui').innerText = "0"; document.getElementById('p2-score-ui').innerText = "0"; showScreen('battle-screen'); nextBattleQuestion();
         }
     }
+
+    /* ========================================
+       V3.0 OYUN MOTORLARI (TAM SÜRÜM)
+       ======================================== */
+
+    /* 1. AIR DROP SCAN LOGIC */
+    let AIR_STATE = { count: 0, max: 5, currentQ: null };
+    function startAirDrop(uWords, aWords) {
+        showScreen('air-screen'); AIR_STATE.count = 0; GAME_STATE.score = 0; 
+        document.getElementById('air-score-ui').innerText = "0/5"; 
+        let zone = document.getElementById('air-zone'); zone.innerHTML = '';
+        
+        function nextDrop() {
+            if(AIR_STATE.count >= AIR_STATE.max) { triggerFinal(false, "SCAN COMPLETE!", "Radyo sinyali tertemiz. Eşyalar senin!"); return; }
+            AIR_STATE.currentQ = uWords[Math.floor(Math.random()*uWords.length)];
+            document.getElementById('air-target-ui').innerText = `RADAR: ${AIR_STATE.currentQ.tr}`;
+            
+            zone.innerHTML = '';
+            let options = [AIR_STATE.currentQ.en];
+            while(options.length < 3) { let r = aWords[Math.floor(Math.random()*aWords.length)].en; if(!options.includes(r)) options.push(r); }
+            options.sort(()=>Math.random()-0.5);
+
+            options.forEach((opt, idx) => {
+                let d = document.createElement('div'); d.className = 'air-crate'; d.innerText = opt;
+                d.style.left = (20 + idx * 30) + "%"; d.style.top = "-200px";
+                let p = document.createElement('div'); p.className = 'parachute'; d.appendChild(p);
+                
+                // Animasyon ekle (hız rastgele)
+                let dur = 3 + Math.random()*2;
+                d.style.animation = `airdropFall ${dur}s linear forwards`;
+                
+                d.onclick = () => {
+                    if(opt === AIR_STATE.currentQ.en) {
+                        playSound('win'); d.style.background = "var(--success)"; d.innerHTML = "GÜVENLİ"; 
+                        GAME_STATE.score += 200; addXP(100); showToast("DROP ALINDI!");
+                        AIR_STATE.count++; document.getElementById('air-score-ui').innerText = `${AIR_STATE.count}/5`;
+                        Array.from(zone.children).forEach(c => c.style.pointerEvents = 'none');
+                        window.v3AirInterval = setTimeout(nextDrop, 1000);
+                    } else {
+                        playSound('wrong'); d.style.background = "var(--danger)"; d.innerHTML = "BOOM!";
+                        Array.from(zone.children).forEach(c => c.style.pointerEvents = 'none');
+                        setTimeout(() => triggerFinal(false, "SİNYAL KOPTU!", "Yanlış kutuyu açtın, düşman yerini tespit etti."), 1000);
+                    }
+                };
+                zone.appendChild(d);
+            });
+        }
+        nextDrop();
+    }
+
+    /* 2. GRAVITY TUNNEL LOGIC */
+    let TUNNEL_STATE = { count: 0, max: 5 };
+    function startTunnel(uWords, aWords) {
+        showScreen('tunnel-screen'); TUNNEL_STATE.count = 0; GAME_STATE.score = 0;
+        
+        function nextDoor() {
+            if(TUNNEL_STATE.count >= TUNNEL_STATE.max) { triggerFinal(false, "TÜNEL AŞILDI!", "Işık hızına ulaştın ve sağ kurtuldun."); return; }
+            let q = uWords[Math.floor(Math.random()*uWords.length)];
+            document.getElementById('tunnel-q-ui').innerText = `HEDEF: ${q.en}`;
+            
+            let area = document.getElementById('tunnel-doors-area'); area.innerHTML = '';
+            let opts = [q.tr];
+            while(opts.length < 3) { let r = aWords[Math.floor(Math.random()*aWords.length)].tr; if(!opts.includes(r)) opts.push(r); }
+            opts.sort(()=>Math.random()-0.5);
+
+            opts.forEach(opt => {
+                let d = document.createElement('div'); d.className = 't-door'; d.innerText = opt;
+                d.onclick = () => {
+                    if(opt === q.tr) {
+                        playSound('win'); d.style.borderColor = "var(--success)"; d.style.boxShadow = "inset 0 0 50px var(--success)";
+                        GAME_STATE.score += 150; addXP(100); showToast("DOĞRU KAPI!");
+                        TUNNEL_STATE.count++; setTimeout(nextDoor, 800);
+                    } else {
+                        playSound('wrong'); d.style.borderColor = "var(--danger)"; d.style.background = "var(--danger)";
+                        setTimeout(() => triggerFinal(false, "DUVARA ÇARPTIN!", "Yanlış kapıya girdin, tünel çöktü."), 1000);
+                    }
+                };
+                area.appendChild(d);
+            });
+        }
+        nextDoor();
+    }
+
+    /* 3. CHEM REACTION LOGIC */
+    let CHEM_STATE = { count: 0, max: 5 };
+    function startChem(uWords, aWords) {
+        showScreen('chem-screen'); CHEM_STATE.count = 0; GAME_STATE.score = 0;
+        
+        function nextReaction() {
+            if(CHEM_STATE.count >= CHEM_STATE.max) { triggerFinal(false, "FORMÜL TAMAM!", "Mükemmel reaksiyon, yeni elementi buldun."); return; }
+            let q = uWords[Math.floor(Math.random()*uWords.length)];
+            document.getElementById('chem-q-ui').innerText = `Sentez: ${q.tr}`;
+            
+            let liq = document.getElementById('chem-liquid');
+            liq.style.height = "20%"; liq.style.background = "#10b981"; liq.innerText = "";
+            
+            let area = document.getElementById('chem-flasks-area'); area.innerHTML = '';
+            let opts = [q.en];
+            while(opts.length < 3) { let r = aWords[Math.floor(Math.random()*aWords.length)].en; if(!opts.includes(r)) opts.push(r); }
+            opts.sort(()=>Math.random()-0.5);
+
+            opts.forEach(opt => {
+                let f = document.createElement('div'); f.className = 'flask'; f.innerText = opt;
+                f.onclick = () => {
+                    if(opt === q.en) {
+                        playSound('win'); GAME_STATE.score += 180; addXP(150);
+                        liq.style.height = "90%"; liq.style.background = "var(--accent)"; liq.innerText = "SUCCESS";
+                        f.style.animation = "explosionChem 0.5s forwards";
+                        CHEM_STATE.count++; setTimeout(nextReaction, 1500);
+                    } else {
+                        playSound('wrong');
+                        liq.style.height = "100%"; liq.style.background = "var(--danger)"; liq.innerText = "DANGER";
+                        f.style.animation = "badExplosion 0.5s forwards";
+                        setTimeout(() => triggerFinal(false, "LABORATUVAR PATLADI!", "Yanlış kimyasal karıştırdın!"), 1000);
+                    }
+                };
+                area.appendChild(f);
+            });
+        }
+        nextReaction();
+    }
+
 
     /* ========================================
        YENİ MİNİGAME: CRATE BREAKER (Kasa Kırma)
