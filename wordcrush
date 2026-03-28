@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENG GAME (MEGA ULTIMATE EDITION)</title>
+    <title>ENG GAME (MEGA ULTIMATE EDITION - RANK UP)</title>
     <style>
         /* ========================================
            CORE UI DESIGN & THEME ENGINE
@@ -45,27 +45,34 @@
         }
         .console-input-line { display: flex; padding: 10px 20px; background: rgba(0,255,65,0.1); border-top: 1px solid var(--term-green); }
         .console-prefix { color: #fff; margin-right: 10px; font-size: 20px; font-weight: bold; }
-        #console-input {
-            background: transparent; border: none; color: #fff; font-size: 20px; width: 100%;
-            outline: none; font-family: 'Courier New', Courier, monospace;
-        }
-        .sys-msg { color: var(--accent); } .err-msg { color: var(--danger); text-shadow: 0 0 5px var(--danger); }
-        .success-msg { color: var(--gold); }
+        #console-input { background: transparent; border: none; color: #fff; font-size: 20px; width: 100%; outline: none; font-family: 'Courier New', Courier, monospace; }
+        .sys-msg { color: var(--accent); } .err-msg { color: var(--danger); text-shadow: 0 0 5px var(--danger); } .success-msg { color: var(--gold); }
         .dev-trigger { position: fixed; bottom: 10px; right: 10px; color: rgba(255,255,255,0.2); font-size: 14px; cursor: pointer; z-index: 10000; font-family: monospace; font-weight: bold; }
         .dev-trigger:hover { color: rgba(255,255,255,0.8); text-shadow: 0 0 10px #fff; }
+
+        /* --- RANK UI --- */
+        .rank-container {
+            background: rgba(15, 23, 42, 0.9); border: 3px solid var(--accent); padding: 15px 40px; 
+            border-radius: 20px; text-align: center; box-shadow: 0 0 25px rgba(56, 189, 248, 0.3); width: 350px;
+        }
+        .rank-title { color: var(--accent); font-size: 14px; font-weight: bold; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; }
+        #rank-name-ui { font-size: 32px; font-weight: 900; color: #fff; text-shadow: 0 0 10px #fff; margin-bottom: 10px; letter-spacing: 2px;}
+        .xp-bar-bg { width: 100%; height: 12px; background: #334155; border-radius: 6px; overflow: hidden; border: 1px solid #64748b; }
+        #xp-bar-fill { width: 0%; height: 100%; background: var(--gold); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px var(--gold); }
+        #xp-text-ui { font-size: 14px; color: #94a3b8; margin-top: 8px; font-weight: bold; }
 
         /* --- MENÜ SİSTEMİ EKRANLARI --- */
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; padding-top: 40px; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(25px); overflow-y: auto; z-index: 10; }
         #main-menu { display: flex; z-index: 20; }
         #game-screen, #quiz-screen, #battle-screen, #bomb-screen, #memory-screen, #rain-screen, #wheel-screen, #voltage-screen, #crate-screen { background: transparent; backdrop-filter: none; z-index: 5; }
 
-        .menu-header { text-align: center; margin-bottom: 40px; animation: slideDown 0.5s ease; }
+        .menu-header { text-align: center; margin-bottom: 30px; animation: slideDown 0.5s ease; }
         @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .menu-title { font-size: 60px; color: var(--accent); letter-spacing: 5px; text-shadow: 0 0 20px var(--accent); margin: 0; font-weight: 900; }
         .menu-sub { color: var(--text-muted); font-size: 18px; text-transform: uppercase; letter-spacing: 5px; font-weight: bold; }
 
         /* BUTONLAR */
-        .big-btn { background: var(--panel-bg); border: 3px solid var(--accent); border-radius: 20px; color: #fff; padding: 20px 40px; font-size: 24px; font-weight: 900; letter-spacing: 2px; cursor: pointer; transition: 0.3s; width: 400px; margin-bottom: 20px; text-transform: uppercase; box-shadow: 0 8px 0 rgba(0,0,0,0.3); }
+        .big-btn { background: var(--panel-bg); border: 3px solid var(--accent); border-radius: 20px; color: #fff; padding: 20px 40px; font-size: 24px; font-weight: 900; letter-spacing: 2px; cursor: pointer; transition: 0.3s; width: 400px; margin-bottom: 15px; text-transform: uppercase; box-shadow: 0 8px 0 rgba(0,0,0,0.3); }
         .big-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 30px var(--accent); transform: translateY(-5px); }
         .big-btn:active { transform: translateY(2px); box-shadow: none; }
         .back-btn { background: transparent; border: 2px solid #64748b; color: #94a3b8; margin-top: 20px; width: 300px; box-shadow: none; }
@@ -75,6 +82,7 @@
 
         .minigame-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 900px; }
         .locked-game { opacity: 0.4; cursor: not-allowed; border-color: #475569 !important; color: #94a3b8 !important; }
+        .unlocked-game { opacity: 1 !important; border-color: var(--success) !important; color: var(--success) !important; cursor: pointer !important; text-shadow: 0 0 10px var(--success); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
 
         /* ÜNİTE KARTLARI & MODLAR */
         .card-container { width: 100%; max-width: 800px; padding: 0 20px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -169,7 +177,7 @@
         @keyframes rainFall { to { top: 110vh; } }
         .rain-explode { animation: fire-glow 0.3s alternate infinite, popOut 0.3s forwards; pointer-events: none; border-color: var(--success) !important; background: var(--success) !important; color: #000 !important;}
 
-        /* --- MINIGAMES: VOLTAGE CUT (NEW) --- */
+        /* --- MINIGAMES: VOLTAGE CUT --- */
         #voltage-screen { background: radial-gradient(circle, #0a0a2a 0%, #000 100%); }
         .voltage-area { width: 85%; height: 60vh; background: #050510; border: 6px solid #222; border-radius: 30px; position: relative; margin-top: 30px; box-shadow: inset 0 0 60px #000; overflow: hidden; touch-action: none; }
         .voltage-node { position: absolute; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; text-align: center; padding: 10px; cursor: pointer; z-index: 10; border: 4px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
@@ -180,7 +188,7 @@
         .zap-effect { animation: zapFlash 0.3s; }
         @keyframes zapFlash { 0%, 100% { background: #050510; } 50% { background: #00ffff; } }
 
-        /* --- MINIGAMES: CRATE BREAKER (NEW) --- */
+        /* --- MINIGAMES: CRATE BREAKER --- */
         #crate-screen { background: url('https://www.transparenttextures.com/patterns/dark-matter.png'), #111; }
         .crates-container { display: flex; gap: 50px; margin-top: 60px; }
         .crate { width: 220px; height: 220px; background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), #8b4513; border: 10px solid #3e1f08; border-radius: 15px; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; color: #fff; text-shadow: 2px 2px 5px #000; box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.5); transition: transform 0.1s; }
@@ -226,11 +234,13 @@
         <span class="menu-sub">MEGA ULTIMATE EDITION</span>
     </div>
     
-    <div style="display:flex; gap: 20px; margin-bottom: 30px;">
-        <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid var(--success); padding: 15px 40px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);">
-            <div style="color:var(--success); font-size: 14px; font-weight: bold; letter-spacing: 2px;">GÜNLÜK RÜTBE</div>
-            <div style="font-size: 28px; font-weight: 900; color: #fff;">🏆 GLOBAL ELITE</div>
+    <div class="rank-container" style="margin-bottom: 30px;">
+        <div class="rank-title">CS2 RANK SYSTEM</div>
+        <div id="rank-name-ui">🥈 SILVER I</div>
+        <div class="xp-bar-bg">
+            <div id="xp-bar-fill"></div>
         </div>
+        <div id="xp-text-ui">0 / 400 XP</div>
     </div>
 
     <button class="big-btn" onclick="showScreen('mode-menu')">▶ KLASİK MODLAR</button>
@@ -259,7 +269,7 @@
         
         <button class="big-btn locked-game" id="mg-air" data-id="air" data-realname="📡 AIR DROP SCAN" style="width:100%; font-size: 18px;">🔒 KİLİTLİ (V3.0)</button>
         <button class="big-btn locked-game" id="mg-tun" data-id="tunnel" data-realname="🚀 GRAVITY TUNNEL" style="width:100%; font-size: 18px;">🔒 KİLİTLİ (V3.0)</button>
-        <button class="big-btn locked-game" id="mg-chem" data-id="chem" data-realname="🧪 CHEM REACTION" style="width:100%; font-size: 18px; grid-column: span 2;">🔒 KİLİTLİ (V3.0) - Konsoldan Açın</button>
+        <button class="big-btn locked-game" id="mg-chem" data-id="chem" data-realname="🧪 CHEM REACTION" style="width:100%; font-size: 18px; grid-column: span 2;">🔒 KİLİTLİ (V3.0) - GOLD NOVA OL</button>
     </div>
     <button class="big-btn back-btn" onclick="showScreen('main-menu')">GERİ DÖN</button>
 </div>
@@ -428,6 +438,13 @@
     <button class="nav-btn" style="background:var(--accent); color:#000; padding:25px 60px; font-size:24px;" onclick="resetGame()">ANA MENÜYE DÖN</button>
 </div>
 
+<div id="rank-up-modal" class="end-screen" style="z-index: 99999; background: rgba(0,0,0,0.95);">
+    <h1 class="end-title" style="color: var(--gold); font-size: 90px; text-shadow: 0 0 50px var(--gold); animation: popOut 0.5s reverse forwards;">RANK UP!</h1>
+    <div id="new-rank-text" style="font-size: 60px; color: #fff; font-weight: 900; margin-bottom: 30px; text-transform: uppercase;">🌟 GOLD NOVA I</div>
+    <div id="unlock-msg" style="font-size: 28px; color: var(--success); margin-bottom: 50px; font-weight: bold; text-shadow: 0 0 15px var(--success); display: none;">🔓 TEBRİKLER! V3.0 GİZLİ OYUNLARIN KİLİDİ AÇILDI!</div>
+    <button class="big-btn" onclick="document.getElementById('rank-up-modal').style.display='none'" style="border-color: var(--gold); color: var(--gold); box-shadow: 0 0 20px rgba(251,191,36,0.4);">DEVAM ET</button>
+</div>
+
 <script>
     /* ========================================
        SİSTEM DEĞİŞKENLERİ VE VERİTABANI
@@ -461,13 +478,80 @@
     let WHEEL_STATE = { isSpinning: false, currentRot: 0 };
 
     /* ========================================
-       MATRIX INTRO & HACKER CONSOLE (PRO LEVEL)
+       YENİ EKLENEN: CS2 RANK SİSTEMİ
+       ======================================== */
+    const RANKS = [
+        { name: "SILVER I", icon: "🥈", xp: 0 },
+        { name: "SILVER II", icon: "🥈", xp: 400 },
+        { name: "SILVER III", icon: "🥈", xp: 800 },
+        { name: "SILVER IV", icon: "🥈", xp: 1200 },
+        { name: "SILVER ELITE", icon: "🥈", xp: 1600 },
+        { name: "GOLD NOVA I", icon: "🌟", xp: 2000 }
+    ];
+    let RANK_STATE = { xp: 0, level: 0 };
+
+    function addXP(amount) {
+        if(RANK_STATE.level >= RANKS.length - 1) return; // Zirvedesin kral
+        RANK_STATE.xp += amount;
+        
+        let nextRank = RANKS[RANK_STATE.level + 1];
+        if(RANK_STATE.xp >= nextRank.xp) {
+            RANK_STATE.level++;
+            showRankUpModal();
+            if(RANK_STATE.level === 5) { // Gold Nova 1'e ulaştık!
+                unlockV3Games();
+            }
+        }
+        updateRankUI();
+    }
+
+    function updateRankUI() {
+        let current = RANKS[RANK_STATE.level];
+        let next = RANKS[RANK_STATE.level + 1];
+        document.getElementById('rank-name-ui').innerText = current.icon + " " + current.name;
+        
+        if(!next) {
+            document.getElementById('xp-bar-fill').style.width = "100%";
+            document.getElementById('xp-text-ui').innerText = "MAX RANK!";
+            document.getElementById('xp-text-ui').style.color = "var(--gold)";
+        } else {
+            let range = next.xp - current.xp;
+            let progress = RANK_STATE.xp - current.xp;
+            let pct = (progress / range) * 100;
+            document.getElementById('xp-bar-fill').style.width = pct + "%";
+            document.getElementById('xp-text-ui').innerText = `${progress} / ${range} XP`;
+        }
+    }
+
+    function showRankUpModal() {
+        playSound('bonus');
+        setTimeout(() => playSound('win'), 500); // Havalı giriş
+        document.getElementById('rank-up-modal').style.display = 'flex';
+        document.getElementById('new-rank-text').innerText = RANKS[RANK_STATE.level].icon + " " + RANKS[RANK_STATE.level].name;
+        
+        if(RANK_STATE.level === 5) {
+            document.getElementById('unlock-msg').style.display = 'block';
+        }
+    }
+
+    function unlockV3Games() {
+        document.querySelectorAll('.locked-game').forEach(el => { 
+            el.classList.remove('locked-game'); 
+            el.classList.add('unlocked-game');
+            el.innerText = el.dataset.realname; 
+            el.onclick = () => { alert("Bu oyun V3.0 için hazırlanıyor, Rank açılışı başarılı!"); }; 
+        });
+        printConsole("Rank Threshold Hit. All restricted modules unlocked automatically.", "success-msg");
+    }
+
+    /* ========================================
+       MATRIX INTRO & HACKER CONSOLE
        ======================================== */
     let SYS = { auth: false, open: false };
 
     function playIntro() {
         const c = document.getElementById('intro-container');
-        const msgs = ["[SYSTEM]: Initializing Core Framework...", "[SYSTEM]: Loading English Vocabulary Database...", "[WARN]: Security protocol bypassed by User.", "[OK]: Environment ready. Let the games begin."];
+        const msgs = ["[SYSTEM]: Initializing Core Framework...", "[SYSTEM]: Loading English Vocabulary Database...", "[SYSTEM]: Integrating Rank Network...", "[WARN]: Security protocol bypassed by User.", "[OK]: Environment ready. Let the games begin."];
         let delay = 0;
         msgs.forEach(m => {
             setTimeout(() => { let p = document.createElement('div'); p.className='intro-log'; p.innerText=m; c.appendChild(p); playSound('correct'); }, delay);
@@ -476,6 +560,7 @@
         setTimeout(() => {
             document.getElementById('intro-screen').style.display = 'none';
             document.getElementById('main-menu').style.display = 'flex';
+            updateRankUI(); // Intro bitince Rank UI'yi güncelle
             playSound('win');
         }, delay + 800);
     }
@@ -514,10 +599,11 @@
         let args = cmd.split(' '); let c = args[0].toLowerCase();
         if(c === '/help') {
             printConsole("--- COMMAND LIST ---", "sys-msg");
-            printConsole("set_gravity <val> : Word Rain hızını değiştirir (Örn: set_gravity 0.5)", "sys-msg");
+            printConsole("set_gravity <val> : Word Rain hızını değiştirir", "sys-msg");
             printConsole("add_time <sec>    : Bomb Defuse moduna süre ekler", "sys-msg");
             printConsole("matrix_mode       : Temayı kod akışına çevirir", "sys-msg");
             printConsole("unlock_all        : Kilitli tüm minigameleri açar", "sys-msg");
+            printConsole("set_rank <level>  : Rütbeyi hileyle zorlar (0-5)", "sys-msg");
             printConsole("clear             : Konsolu temizler", "sys-msg");
             printConsole("exit              : Konsolu kapatır", "sys-msg");
         } else if(c === 'set_gravity') {
@@ -527,8 +613,16 @@
         } else if(c === 'matrix_mode') {
             document.body.style.background = "#000"; document.documentElement.style.setProperty('--accent', '#00ff41'); document.documentElement.style.setProperty('--panel-bg', 'rgba(0,20,0,0.9)'); printConsole("Matrix loaded.", "success-msg");
         } else if(c === 'unlock_all') { 
-            document.querySelectorAll('.locked-game').forEach(el => { el.style.opacity = '1'; el.classList.remove('locked-game'); el.innerText = el.dataset.realname; el.onclick = () => { alert("Bu oyun V3.0 için hazırlanıyor, konsol testi başarılı!"); }; });
-            printConsole("All restricted modules unlocked.", "success-msg"); playSound('bonus');
+            unlockV3Games(); playSound('bonus');
+        } else if(c === 'set_rank') {
+            let level = parseInt(args[1]);
+            if(level >= 0 && level <= 5) {
+                RANK_STATE.level = level;
+                RANK_STATE.xp = RANKS[level].xp;
+                updateRankUI();
+                if(level === 5) unlockV3Games();
+                printConsole(`Rank set to ${RANKS[level].name}`, "success-msg");
+            }
         } else if(c === 'clear') { document.getElementById('console-output').innerHTML = '';
         } else if(c === 'exit') { toggleConsole();
         } else { printConsole(`Command not found: ${c}`, "err-msg"); }
@@ -645,7 +739,7 @@
         else if(CRATE_STATE.hits[idx] === 3) {
             c.classList.add('crate-broken');
             if(idx === CRATE_STATE.correctIdx) {
-                playSound('win'); GAME_STATE.score += 200; c.innerText = "+200 XP"; showToast("CRATE OPENED!");
+                playSound('win'); GAME_STATE.score += 200; addXP(200); c.innerText = "+200 XP"; showToast("CRATE OPENED!");
                 for(let i=0;i<3;i++) document.getElementById('crate-'+i).style.pointerEvents='none';
                 setTimeout(() => { CRATE_STATE.currentQ++; loadCrateQuestion(); }, 1500);
             } else {
@@ -685,7 +779,7 @@
             let absX = x + areaRect.left; let absY = y + areaRect.top;
             
             if(absX > endRect.left && absX < endRect.right && absY > endRect.top && absY < endRect.bottom) {
-                VOLTAGE_STATE.isDragging = false; playSound('correct'); GAME_STATE.score += 150; showToast("BAĞLANTI TAMAM!");
+                VOLTAGE_STATE.isDragging = false; playSound('correct'); GAME_STATE.score += 150; addXP(150); showToast("BAĞLANTI TAMAM!");
                 setTimeout(() => { VOLTAGE_STATE.currentQ++; loadVoltageQuestion(uWords, aWords); }, 1000);
             }
         };
@@ -724,6 +818,7 @@
             WHEEL_STATE.isSpinning = false; document.getElementById('spin-btn').innerText = "YENİDEN ÇEVİR!"; playSound('win');
             let deg = (360 - (WHEEL_STATE.currentRot % 360) + 270) % 360; let idx = Math.floor(deg / (360/WHEEL_TASKS.length));
             document.getElementById('wheel-task-num').innerText = `GÖREV KARTI #${idx + 1}`; document.getElementById('wheel-task-text').innerText = WHEEL_TASKS[idx]; document.getElementById('wheel-result-modal').style.display = 'flex';
+            addXP(100); // Çark çevirdi diye biraz XP ver
         }, 4100);
     }
 
@@ -748,7 +843,7 @@
         if(w.innerText === BOMB_STATE.questions[BOMB_STATE.currentQ].correct) { playSound('correct'); BOMB_STATE.currentQ++; setTimeout(loadBombQuestion, 400); } else { w.classList.add('cut-wrong'); explodeBomb(); }
     }
     function explodeBomb() { BOMB_STATE.isExploded = true; clearInterval(BOMB_STATE.interval); playSound('wrong'); document.body.classList.add('exploded-bg'); document.getElementById('bomb-timer-ui').innerText="ERR.OR"; document.getElementById('bomb-timer-ui').style.color="#000"; document.getElementById('bomb-timer-ui').style.background="#ef4444"; setTimeout(() => { triggerFinal(false, "BOMBA PATLADI! 💥", "Süre doldu veya yanlış kestin."); }, 1500); }
-    function defuseBombWin() { BOMB_STATE.isExploded = true; clearInterval(BOMB_STATE.interval); playSound('win'); GAME_STATE.score += Math.floor(BOMB_STATE.timeLimit*100 + BOMB_STATE.timeRemaining/10); document.getElementById('bomb-timer-ui').style.color="#22c55e"; setTimeout(() => triggerFinal(false, "BOMB DEFUSED! 🛡️", "Şehri kurtardın!"), 1000); }
+    function defuseBombWin() { BOMB_STATE.isExploded = true; clearInterval(BOMB_STATE.interval); playSound('win'); GAME_STATE.score += Math.floor(BOMB_STATE.timeLimit*100 + BOMB_STATE.timeRemaining/10); addXP(BOMB_STATE.timeLimit*40); document.getElementById('bomb-timer-ui').style.color="#22c55e"; setTimeout(() => triggerFinal(false, "BOMB DEFUSED! 🛡️", "Şehri kurtardın!"), 1000); }
 
     /* ========================================
        MEMORY CARDS MOTORU (3D FLIP)
@@ -762,7 +857,7 @@
     function flipMemoryCard(c) {
         if(MEMORY_STATE.lockBoard||c===MEMORY_STATE.firstCard||c.classList.contains('matched')) return; c.classList.add('flipped');
         if(!MEMORY_STATE.firstCard) { MEMORY_STATE.firstCard=c; return; } MEMORY_STATE.secondCard=c; MEMORY_STATE.lockBoard=true; MEMORY_STATE.moves++; document.getElementById('mem-moves-ui').innerText=MEMORY_STATE.moves;
-        if(MEMORY_STATE.firstCard.dataset.pair===MEMORY_STATE.secondCard.dataset.pair) { playSound('correct'); GAME_STATE.score+=200; MEMORY_STATE.firstCard.classList.add('matched'); MEMORY_STATE.secondCard.classList.add('matched'); MEMORY_STATE.matched++; document.getElementById('mem-score-ui').innerText=`${MEMORY_STATE.matched}/8`; MEMORY_STATE.firstCard=null; MEMORY_STATE.lockBoard=false; if(MEMORY_STATE.matched===8) setTimeout(()=>triggerFinal(false,"HAFIZA USTASI! 🧠",`${MEMORY_STATE.moves} hamlede bitirdin.`),800); } else { playSound('wrong'); setTimeout(()=>{MEMORY_STATE.firstCard.classList.remove('flipped');MEMORY_STATE.secondCard.classList.remove('flipped');MEMORY_STATE.firstCard=null;MEMORY_STATE.lockBoard=false;},1000); }
+        if(MEMORY_STATE.firstCard.dataset.pair===MEMORY_STATE.secondCard.dataset.pair) { playSound('correct'); GAME_STATE.score+=200; addXP(100); MEMORY_STATE.firstCard.classList.add('matched'); MEMORY_STATE.secondCard.classList.add('matched'); MEMORY_STATE.matched++; document.getElementById('mem-score-ui').innerText=`${MEMORY_STATE.matched}/8`; MEMORY_STATE.firstCard=null; MEMORY_STATE.lockBoard=false; if(MEMORY_STATE.matched===8) setTimeout(()=>triggerFinal(false,"HAFIZA USTASI! 🧠",`${MEMORY_STATE.moves} hamlede bitirdin.`),800); } else { playSound('wrong'); setTimeout(()=>{MEMORY_STATE.firstCard.classList.remove('flipped');MEMORY_STATE.secondCard.classList.remove('flipped');MEMORY_STATE.firstCard=null;MEMORY_STATE.lockBoard=false;},1000); }
     }
 
     /* ========================================
@@ -771,7 +866,7 @@
     function startWordRain(uWords) {
         showScreen('rain-screen'); RAIN_STATE.hp=3; GAME_STATE.score=0; RAIN_STATE.fallingDivs=[]; updateRainUI(); let aWords=[]; Object.values(MASTER_DICT).forEach(u=>aWords.push(...u.words)); const area=document.getElementById('rain-area'); area.innerHTML='';
         function setTarget() { let r=uWords[Math.floor(Math.random()*uWords.length)]; RAIN_STATE.targetWord=r; document.getElementById('rain-target-ui').innerText=`"${r.en}"`; } setTarget();
-        RAIN_STATE.spawnInterval = setInterval(() => { let isT=Math.random()>0.6; let dText=isT?RAIN_STATE.targetWord.tr:aWords[Math.floor(Math.random()*aWords.length)].tr; let d=document.createElement('div'); d.className='raindrop'; d.innerText=dText; d.style.left=Math.floor(Math.random()*80)+10+"%"; d.style.animation=`rainFall ${4/RAIN_STATE.speedMod}s linear forwards`; d.onclick=()=>{ if(isT&&d.innerText===RAIN_STATE.targetWord.tr){ playSound('correct'); d.classList.add('rain-explode'); GAME_STATE.score+=150; updateRainUI(); setTimeout(()=>{area.innerHTML=''; RAIN_STATE.fallingDivs=[]; setTarget();},300); } else { playSound('wrong'); showFeedback("YANLIŞ!","wrong-flash"); d.style.background="red"; RAIN_STATE.hp--; updateRainUI(); if(RAIN_STATE.hp<=0){clearInterval(RAIN_STATE.interval);clearInterval(RAIN_STATE.spawnInterval);triggerFinal(false,"OYUN BİTTİ 🌧️","Kelime kaçtı!");} } }; area.appendChild(d); RAIN_STATE.fallingDivs.push(d); }, 1500 / RAIN_STATE.speedMod);
+        RAIN_STATE.spawnInterval = setInterval(() => { let isT=Math.random()>0.6; let dText=isT?RAIN_STATE.targetWord.tr:aWords[Math.floor(Math.random()*aWords.length)].tr; let d=document.createElement('div'); d.className='raindrop'; d.innerText=dText; d.style.left=Math.floor(Math.random()*80)+10+"%"; d.style.animation=`rainFall ${4/RAIN_STATE.speedMod}s linear forwards`; d.onclick=()=>{ if(isT&&d.innerText===RAIN_STATE.targetWord.tr){ playSound('correct'); d.classList.add('rain-explode'); GAME_STATE.score+=150; addXP(50); updateRainUI(); setTimeout(()=>{area.innerHTML=''; RAIN_STATE.fallingDivs=[]; setTarget();},300); } else { playSound('wrong'); showFeedback("YANLIŞ!","wrong-flash"); d.style.background="red"; RAIN_STATE.hp--; updateRainUI(); if(RAIN_STATE.hp<=0){clearInterval(RAIN_STATE.interval);clearInterval(RAIN_STATE.spawnInterval);triggerFinal(false,"OYUN BİTTİ 🌧️","Kelime kaçtı!");} } }; area.appendChild(d); RAIN_STATE.fallingDivs.push(d); }, 1500 / RAIN_STATE.speedMod);
         RAIN_STATE.interval = setInterval(()=>{ RAIN_STATE.fallingDivs.forEach((d,i)=>{ if(!d)return; if(d.getBoundingClientRect().top>window.innerHeight-150){ if(d.innerText===RAIN_STATE.targetWord.tr){ playSound('wrong'); showFeedback("-1 CAN!","wrong-flash"); RAIN_STATE.hp--; updateRainUI(); if(RAIN_STATE.hp<=0){clearInterval(RAIN_STATE.interval);clearInterval(RAIN_STATE.spawnInterval);triggerFinal(false,"OYUN BİTTİ 🌧️","Kelime kaçtı!");}else setTarget(); } if(d.parentNode)d.parentNode.removeChild(d); RAIN_STATE.fallingDivs[i]=null; } }); RAIN_STATE.fallingDivs=RAIN_STATE.fallingDivs.filter(x=>x!==null); }, 100);
     }
     function updateRainUI() { document.getElementById('rain-score-ui').innerText=GAME_STATE.score; document.getElementById('rain-hp-ui').innerText="❤️".repeat(RAIN_STATE.hp)||"💀"; }
@@ -782,19 +877,19 @@
     function buildGrids() { renderGrid('en-grid','en'); renderGrid('tr-grid','tr'); }
     function renderGrid(id, type) { const c=document.getElementById(id); c.innerHTML=''; if(!GAME_STATE[type+'Data']){ let p=[...activeGamePool].sort(()=>Math.random()-0.5); GAME_STATE[type+'Data']=[]; for(let i=0;i<15;i++)GAME_STATE[type+'Data'].push(p[i]); } GAME_STATE[type+'Data'].forEach((w,i)=>{ if(!w)return; let row=Math.floor(i/3), col=i%3, colr=w.color!==undefined?w.color:Math.floor(Math.random()*4); w.color=colr; let d=document.createElement('div'); d.innerText=type==='en'?w.en:w.tr; d.dataset.index=i; d.dataset.type=type; d.dataset.pair=w.pair||w.en; d.dataset.color=type==='tr'?'tr':colr; d.onclick=()=>onTileClick(d); d.className=`tile ${type==='tr'?'tr-tile':'c-'+colr}`; d.style.left=(col*132+20)+"px"; d.style.top=(row*97+20)+"px"; c.appendChild(d); }); }
     function onTileClick(t) { if(GAME_STATE.bonusActive)return; if(t.dataset.type==='en'){if(GAME_STATE.selectedEN)GAME_STATE.selectedEN.classList.remove('active-sel');GAME_STATE.selectedEN=t;}else{if(GAME_STATE.selectedTR)GAME_STATE.selectedTR.classList.remove('active-sel');GAME_STATE.selectedTR=t;} t.classList.add('active-sel'); if(GAME_STATE.selectedEN&&GAME_STATE.selectedTR)checkPair(); }
-    function checkPair() { let e=GAME_STATE.selectedEN, t=GAME_STATE.selectedTR; if(e.dataset.pair===t.dataset.pair){GAME_STATE.score+=100;playSound('correct');showFeedback("DOĞRU!","correct-flash");removeTilesWM(e,t);}else{playSound('wrong');showFeedback("YANLIŞ!","wrong-flash");e.classList.remove('active-sel');t.classList.remove('active-sel');} GAME_STATE.selectedEN=null;GAME_STATE.selectedTR=null;updateWMUI(); }
+    function checkPair() { let e=GAME_STATE.selectedEN, t=GAME_STATE.selectedTR; if(e.dataset.pair===t.dataset.pair){GAME_STATE.score+=100; addXP(100); playSound('correct');showFeedback("DOĞRU!","correct-flash");removeTilesWM(e,t);}else{playSound('wrong');showFeedback("YANLIŞ!","wrong-flash");e.classList.remove('active-sel');t.classList.remove('active-sel');} GAME_STATE.selectedEN=null;GAME_STATE.selectedTR=null;updateWMUI(); }
     function removeTilesWM(e,t) { let eI=parseInt(e.dataset.index), tI=parseInt(t.dataset.index); e.classList.add('pop'); t.classList.add('pop'); setTimeout(()=>{GAME_STATE.enData[eI]=null;GAME_STATE.trData[tI]=null;applyGravity('en');applyGravity('tr');GAME_STATE.activeCount--;updateWMUI();if(GAME_STATE.activeCount<=0)triggerFinal(false);else scanForBonus();},400); }
     function applyGravity(type) { let d=GAME_STATE[type+'Data']; for(let c=0;c<3;c++){let emp=[];for(let r=4;r>=0;r--){let i=r*3+c;if(d[i]===null)emp.push(i);else if(emp.length>0){let n=emp.shift();d[n]=d[i];d[i]=null;emp.push(i);}}} renderGrid(type+'-grid',type); Array.from(document.getElementById(type+'-grid').children).forEach(c=>{c.classList.remove('gravity-fall');void c.offsetWidth;c.classList.add('gravity-fall');}); }
-    function scanForBonus() { if(GAME_STATE.mode!=='wordmatch'||GAME_STATE.bonusActive)return; let d=GAME_STATE.enData; if(!d)return; let m=new Set(); for(let r=0;r<5;r++){if(d[r*3]&&d[r*3+1]&&d[r*3+2]&&d[r*3].color===d[r*3+1].color&&d[r*3+1].color===d[r*3+2].color){m.add(r*3);m.add(r*3+1);m.add(r*3+2);}} for(let c=0;c<3;c++){for(let r=0;r<=2;r++){if(d[r*3+c]&&d[(r+1)*3+c]&&d[(r+2)*3+c]&&d[r*3+c].color===d[(r+1)*3+c].color&&d[(r+1)*3+c].color===d[(r+2)*3+c].color){m.add(r*3+c);m.add((r+1)*3+c);m.add((r+2)*3+c);}}} if(m.size>=3){GAME_STATE.bonusActive=true;GAME_STATE.score+=500;playSound('bonus');showToast("BONUS COMBO!"); let eIdx=Array.from(m), tIdx=[]; eIdx.forEach(i=>{let p=d[i].pair;let ti=GAME_STATE.trData.findIndex(t=>t&&t.pair===p&&!tIdx.includes(GAME_STATE.trData.indexOf(t)));document.querySelector(`#en-grid .tile[data-index="${i}"]`).classList.add('fire-pop');GAME_STATE.enData[i]=null;if(ti!==-1)tIdx.push(ti);}); tIdx.forEach(i=>{document.querySelector(`#tr-grid .tile[data-index="${i}"]`).classList.add('fire-pop');GAME_STATE.trData[i]=null;}); setTimeout(()=>{let a=[];Object.values(MASTER_DICT).forEach(u=>a.push(...u.words));let ne=[],nt=[];for(let i=0;i<eIdx.length;i++){let w=a[Math.floor(Math.random()*a.length)],c=Math.floor(Math.random()*4);ne.push({en:w.en,tr:w.tr,pair:w.en,color:c});nt.push({en:w.en,tr:w.tr,pair:w.en,color:'tr'});}applyGravityWithRefill('en',ne);applyGravityWithRefill('tr',nt);updateWMUI();setTimeout(()=>{GAME_STATE.bonusActive=false;scanForBonus();},600);},400); } }
+    function scanForBonus() { if(GAME_STATE.mode!=='wordmatch'||GAME_STATE.bonusActive)return; let d=GAME_STATE.enData; if(!d)return; let m=new Set(); for(let r=0;r<5;r++){if(d[r*3]&&d[r*3+1]&&d[r*3+2]&&d[r*3].color===d[r*3+1].color&&d[r*3+1].color===d[r*3+2].color){m.add(r*3);m.add(r*3+1);m.add(r*3+2);}} for(let c=0;c<3;c++){for(let r=0;r<=2;r++){if(d[r*3+c]&&d[(r+1)*3+c]&&d[(r+2)*3+c]&&d[r*3+c].color===d[(r+1)*3+c].color&&d[(r+1)*3+c].color===d[(r+2)*3+c].color){m.add(r*3+c);m.add((r+1)*3+c);m.add((r+2)*3+c);}}} if(m.size>=3){GAME_STATE.bonusActive=true;GAME_STATE.score+=500; addXP(300); playSound('bonus');showToast("BONUS COMBO!"); let eIdx=Array.from(m), tIdx=[]; eIdx.forEach(i=>{let p=d[i].pair;let ti=GAME_STATE.trData.findIndex(t=>t&&t.pair===p&&!tIdx.includes(GAME_STATE.trData.indexOf(t)));document.querySelector(`#en-grid .tile[data-index="${i}"]`).classList.add('fire-pop');GAME_STATE.enData[i]=null;if(ti!==-1)tIdx.push(ti);}); tIdx.forEach(i=>{document.querySelector(`#tr-grid .tile[data-index="${i}"]`).classList.add('fire-pop');GAME_STATE.trData[i]=null;}); setTimeout(()=>{let a=[];Object.values(MASTER_DICT).forEach(u=>a.push(...u.words));let ne=[],nt=[];for(let i=0;i<eIdx.length;i++){let w=a[Math.floor(Math.random()*a.length)],c=Math.floor(Math.random()*4);ne.push({en:w.en,tr:w.tr,pair:w.en,color:c});nt.push({en:w.en,tr:w.tr,pair:w.en,color:'tr'});}applyGravityWithRefill('en',ne);applyGravityWithRefill('tr',nt);updateWMUI();setTimeout(()=>{GAME_STATE.bonusActive=false;scanForBonus();},600);},400); } }
     function applyGravityWithRefill(type,q) { let d=GAME_STATE[type+'Data']; for(let c=0;c<3;c++){let emp=[];for(let r=4;r>=0;r--){let i=r*3+c;if(d[i]===null)emp.push(i);else if(emp.length>0){let n=emp.shift();d[n]=d[i];d[i]=null;emp.push(i);}} emp.forEach(idx=>{if(q.length>0){let p=q.shift();d[idx]={en:p.en,tr:p.tr,pair:p.pair,color:type==='en'?p.color:'tr'};}});} renderGrid(type+'-grid',type); Array.from(document.getElementById(type+'-grid').children).forEach(c=>{c.classList.remove('gravity-fall');void c.offsetWidth;c.classList.add('gravity-fall');}); }
     function updateWMUI() { document.getElementById('wm-unit').innerText=GAME_STATE.unit; document.getElementById('wm-score').innerText=GAME_STATE.score; document.getElementById('wm-tiles').innerText=GAME_STATE.activeCount; }
     
     function loadQuizQuestion() { if(QUIZ_STATE.currentIdx>=QUIZ_STATE.questions.length){triggerFinal(true);return;} let q=QUIZ_STATE.questions[QUIZ_STATE.currentIdx]; document.getElementById('quiz-q-text').innerText=`"${q.en}" = ?`; for(let i=0;i<4;i++){let b=document.getElementById('q-opt-'+i);b.innerText=q.options[i];b.className='quiz-opt-btn';b.disabled=false;} }
-    function checkQuizAnswer(i) { let q=QUIZ_STATE.questions[QUIZ_STATE.currentIdx], b=document.getElementById('q-opt-'+i); for(let j=0;j<4;j++)document.getElementById('q-opt-'+j).disabled=true; if(b.innerText===q.correct){b.classList.add('correct-flash');GAME_STATE.score+=100;playSound('correct');}else{b.classList.add('wrong-flash');playSound('wrong');for(let j=0;j<4;j++)if(document.getElementById('q-opt-'+j).innerText===q.correct)document.getElementById('q-opt-'+j).classList.add('correct-flash');} updateQuizUI(); setTimeout(()=>{QUIZ_STATE.currentIdx++;loadQuizQuestion();updateQuizUI();},1500); }
+    function checkQuizAnswer(i) { let q=QUIZ_STATE.questions[QUIZ_STATE.currentIdx], b=document.getElementById('q-opt-'+i); for(let j=0;j<4;j++)document.getElementById('q-opt-'+j).disabled=true; if(b.innerText===q.correct){b.classList.add('correct-flash');GAME_STATE.score+=100; addXP(150); playSound('correct');}else{b.classList.add('wrong-flash');playSound('wrong');for(let j=0;j<4;j++)if(document.getElementById('q-opt-'+j).innerText===q.correct)document.getElementById('q-opt-'+j).classList.add('correct-flash');} updateQuizUI(); setTimeout(()=>{QUIZ_STATE.currentIdx++;loadQuizQuestion();updateQuizUI();},1500); }
     function updateQuizUI() { document.getElementById('qz-unit').innerText=GAME_STATE.unit; document.getElementById('qz-score').innerText=GAME_STATE.score; document.getElementById('qz-progress').innerText=(QUIZ_STATE.currentIdx>=10?10:QUIZ_STATE.currentIdx+1)+"/10"; }
     
     function nextBattleQuestion() { GAME_STATE.isBattleLocked=false; document.getElementById('p1-side').classList.remove('win-flash'); document.getElementById('p2-side').classList.remove('win-flash'); let a=[]; Object.values(MASTER_DICT).forEach(u=>a.push(...u.words)); let c=MASTER_DICT[GAME_STATE.unit].words[Math.floor(Math.random()*MASTER_DICT[GAME_STATE.unit].words.length)]; let o=[c.tr]; while(o.length<4){let r=a[Math.floor(Math.random()*a.length)].tr;if(!o.includes(r))o.push(r);} o.sort(()=>Math.random()-0.5); BATTLE_Q={en:c.en,tr:c.tr,options:o}; document.getElementById('battle-q-box').innerText=`"${c.en}"`; for(let i=0;i<4;i++){document.getElementById(`p1-opt-${i}`).innerText=o[i];document.getElementById(`p2-opt-${i}`).innerText=o[i];document.getElementById(`p1-opt-${i}`).style.background="";document.getElementById(`p2-opt-${i}`).style.background="";} }
-    function handleBattlePress(p,i) { if(GAME_STATE.isBattleLocked)return; if(BATTLE_Q.options[i]===BATTLE_Q.tr){ GAME_STATE.isBattleLocked=true; playSound('correct'); if(p===1){GAME_STATE.scoreP1+=10;document.getElementById('p1-score-ui').innerText=GAME_STATE.scoreP1;document.getElementById('p1-side').classList.add('win-flash');}else{GAME_STATE.scoreP2+=10;document.getElementById('p2-score-ui').innerText=GAME_STATE.scoreP2;document.getElementById('p2-side').classList.add('win-flash');} setTimeout(nextBattleQuestion,1500); }else{ playSound('wrong'); document.getElementById(`p${p}-opt-${i}`).style.background="var(--danger)"; } }
+    function handleBattlePress(p,i) { if(GAME_STATE.isBattleLocked)return; if(BATTLE_Q.options[i]===BATTLE_Q.tr){ GAME_STATE.isBattleLocked=true; playSound('correct'); if(p===1){GAME_STATE.scoreP1+=10; addXP(20); document.getElementById('p1-score-ui').innerText=GAME_STATE.scoreP1;document.getElementById('p1-side').classList.add('win-flash');}else{GAME_STATE.scoreP2+=10; addXP(20); document.getElementById('p2-score-ui').innerText=GAME_STATE.scoreP2;document.getElementById('p2-side').classList.add('win-flash');} setTimeout(nextBattleQuestion,1500); }else{ playSound('wrong'); document.getElementById(`p${p}-opt-${i}`).style.background="var(--danger)"; } }
 
     /* ========================================
        BİTİŞ EKRANI (Dinamik Final)
