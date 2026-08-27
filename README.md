@@ -795,6 +795,16 @@
             50% { transform: scale(1.5); filter: brightness(2); box-shadow: 0 0 50px #fff; } 
             100% { transform: scale(0); opacity: 0; } 
         }
+        
+        @keyframes crushPop {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.2); filter: brightness(2); box-shadow: 0 0 40px var(--gold); border-color: #fff; z-index: 100;}
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        
+        .crush-anim {
+            animation: crushPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
 
         @keyframes fire-glow { 
             0% { box-shadow: 0 0 15px #ff0055, 0 0 30px #ff0055, inset 0 0 20px #ff0055; border-color:#ff0055;} 
@@ -978,7 +988,7 @@
     </div>
 </div>
 
-<div class="dev-trigger" onclick="toggleConsole()">v3.5.0_domain_destan_build(1400)</div>
+<div class="dev-trigger" onclick="toggleConsole()">v3.6.0_candy_crush_combo_build(1500)</div>
 
 <div id="main-menu" class="screen">
     <div class="menu-header">
@@ -1055,7 +1065,7 @@
         <button class="mod-btn" id="btn-dev-pc" onclick="setDevice('pc')">💻 PC</button>
         <button class="mod-btn" id="btn-dev-tahta" onclick="setDevice('tahta')">🏫 Akıllı Tahta</button>
     </div>
-    <div id="device-info" class="info-box">MEGA UPDATE V3.5: KLASİK MODDAKİ EŞLEŞMEYEN KELİME BUG'I %100 FİXLENDİ! DOMAIN EXPANSION SİSTEMİ AKTİF! 5 COMBO YAP VE ŞOVU İZLE!</div>
+    <div id="device-info" class="info-box">MEGA UPDATE V3.6: CANDY CRUSH MEKANİĞİ EKLENDİ! Renkleri eşleştir 200, 300, 500 bonus kazan! DOMAIN EXPANSION SİSTEMİ AKTİF! 5 COMBO YAP VE ŞOVU İZLE!</div>
     <button class="big-btn back-btn" onclick="showScreen('main-menu')">GERİ DÖN</button>
 </div>
 
@@ -1210,22 +1220,22 @@
        SİSTEM DEĞİŞKENLERİ VE VERİTABANI
        ======================================== */
     const MASTER_DICT = {
-        1: { desc: "Daily routines and breakfast habits.", words: [{en:"Routine", tr:"Rutin"}, {en:"Nap", tr:"Kestirmek"}, {en:"Diary", tr:"Günlük"}, {en:"Visit", tr:"Ziyaret"}, {en:"Wake up", tr:"Uyanmak"}, {en:"Arrive", tr:"Varmak"}, {en:"Course", tr:"Kurs"}, {en:"Rest", tr:"Dinlenmek"}, {en:"Breakfast", tr:"Kahvaltı"}, {en:"Wash", tr:"Yıkamak"}, {en:"Brush", tr:"Fırçalamak"}, {en:"Comb", tr:"Taramak"}, {en:"Leave", tr:"Ayrılmak"}, {en:"Attend", tr:"Katılmak"}, {en:"Return", tr:"Dönmek"}, {en:"Sleep", tr:"Uyumak"}, {en:"Read", tr:"Okumak"}] },
-        2: { desc: "Food, drinks and healthy life.", words: [{en:"Yummy", tr:"Lezzetli"}, {en:"Healthy", tr:"Sağlıklı"}, {en:"Cheese", tr:"Peynir"}, {en:"Butter", tr:"Tereyağı"}, {en:"Honey", tr:"Bal"}, {en:"Bagel", tr:"Simit"}, {en:"Beverage", tr:"İçecek"}, {en:"Jam", tr:"Reçel"}, {en:"Olive", tr:"Zeytin"}, {en:"Sausage", tr:"Sosis"}, {en:"Egg", tr:"Yumurta"}, {en:"Bread", tr:"Ekmek"}, {en:"Milk", tr:"Süt"}, {en:"Tea", tr:"Çay"}, {en:"Coffee", tr:"Kahve"}, {en:"Juice", tr:"Meyve Suyu"}] },
-        3: { desc: "Downtown life, streets and busy cities.", words: [{en:"Downtown", tr:"Şehir Merkezi"}, {en:"Street", tr:"Sokak"}, {en:"Skyscraper", tr:"Gökdelen"}, {en:"Crowded", tr:"Kalabalık"}, {en:"Kiosk", tr:"Büfe"}, {en:"Neighborhood", tr:"Mahalle"}, {en:"Pavement", tr:"Kaldırım"}, {en:"Building", tr:"Bina"}, {en:"Traffic", tr:"Trafik"}, {en:"Pedestrian", tr:"Yaya"}] },
-        4: { desc: "Weather conditions and moods.", words: [{en:"Weather", tr:"Hava Durumu"}, {en:"Stormy", tr:"Fırtınalı"}, {en:"Freezing", tr:"Dondurucu"}, {en:"Lightning", tr:"Şimşek"}, {en:"Mood", tr:"Ruh Hali"}, {en:"Anxious", tr:"Endişeli"}, {en:"Frightened", tr:"Korkmuş"}, {en:"Sunny", tr:"Güneşli"}, {en:"Cloudy", tr:"Bulutlu"}, {en:"Rainy", tr:"Yağmurlu"}] },
-        5: { desc: "Funfairs, bumper cars and thrill.", words: [{en:"Funfair", tr:"Lunapark"}, {en:"Ferris Wheel", tr:"Dönme Dolap"}, {en:"Bumper cars", tr:"Çarpışan araba"}, {en:"Carousel", tr:"Atlı Karınca"}, {en:"Ticket", tr:"Bilet"}, {en:"Thrilling", tr:"Heyecan verici"}, {en:"Amazing", tr:"Şaşırtıcı"}, {en:"Rollercoaster", tr:"Hız Treni"}, {en:"Ghost Train", tr:"Korku Treni"}] },
-        6: { desc: "Occupations and working places.", words: [{en:"Mechanic", tr:"Tamirci"}, {en:"Vet", tr:"Veteriner"}, {en:"Tailor", tr:"Terzi"}, {en:"Driver", tr:"Şoför"}, {en:"Architect", tr:"Mimar"}, {en:"Engineer", tr:"Mühendis"}, {en:"Dentist", tr:"Diş Hekimi"}, {en:"Teacher", tr:"Öğretmen"}, {en:"Nurse", tr:"Hemşire"}, {en:"Lawyer", tr:"Avukat"}] },
-        7: { desc: "Vacation, seaside and sightseeing.", words: [{en:"Vacation", tr:"Tatil"}, {en:"Sightseeing", tr:"Şehir Gezisi"}, {en:"Seaside", tr:"Deniz Kenarı"}, {en:"Forest", tr:"Orman"}, {en:"Tent", tr:"Çadır"}, {en:"Skiing", tr:"Kayak yapmak"}, {en:"Hiking", tr:"Doğa yürüyüşü"}, {en:"Beach", tr:"Plaj"}, {en:"Sand", tr:"Kum"}, {en:"Sunbathe", tr:"Güneşlenmek"}] },
-        8: { desc: "Bookworms and library rules.", words: [{en:"Bookworm", tr:"Kitap Kurdu"}, {en:"Novel", tr:"Roman"}, {en:"Poetry", tr:"Şiir"}, {en:"Library", tr:"Kütüphane"}, {en:"Shelf", tr:"Raf"}, {en:"Borrow", tr:"Ödünç almak"}, {en:"Dictionary", tr:"Sözlük"}, {en:"Magazine", tr:"Dergi"}, {en:"Author", tr:"Yazar"}, {en:"Page", tr:"Sayfa"}] },
-        9: { desc: "Environment, saving the planet.", words: [{en:"Environment", tr:"Çevre"}, {en:"Recycle", tr:"Geri Dönüşüm"}, {en:"Pollution", tr:"Kirlilik"}, {en:"Save", tr:"Korumak"}, {en:"Litter", tr:"Çöp atmak"}, {en:"Waste", tr:"Atık"}, {en:"Planet", tr:"Gezegen"}, {en:"Energy", tr:"Enerji"}, {en:"Solar", tr:"Güneş Enerjisi"}] },
-        10:{ desc: "Democracy, elections and voting process.", words: [{en:"Election", tr:"Seçim"}, {en:"Vote", tr:"Oy Vermek"}, {en:"Candidate", tr:"Aday"}, {en:"Ballot box", tr:"Sandık"}, {en:"Democracy", tr:"Demokrasi"}, {en:"Presidential", tr:"Başkanlık"}, {en:"Campaign", tr:"Kampanya"}, {en:"Public", tr:"Halk"}, {en:"Law", tr:"Yasa"}] }
+        1: { desc: "Appearance and personality traits.", words: [{en:"Generous", tr:"Cömert"}, {en:"Stubborn", tr:"İnatçı"}, {en:"Plump", tr:"Tombul"}, {en:"Outgoing", tr:"Dışa dönük"}, {en:"Punctual", tr:"Dakik"}, {en:"Honest", tr:"Dürüst"}, {en:"Selfish", tr:"Bencil"}, {en:"Clumsy", tr:"Sakar"}, {en:"Hazel", tr:"Ela"}, {en:"Freckle", tr:"Çil"}, {en:"Straight", tr:"Düz"}, {en:"Wavy", tr:"Dalgalı"}, {en:"Attractive", tr:"Çekici"}, {en:"Easygoing", tr:"Uyumlu"}, {en:"Forgetful", tr:"Unutkan"}] },
+        2: { desc: "Indoor, outdoor sports and equipment.", words: [{en:"Archery", tr:"Okçuluk"}, {en:"Equipment", tr:"Ekipman"}, {en:"Helmet", tr:"Kask"}, {en:"Net", tr:"File"}, {en:"Draw", tr:"Berabere"}, {en:"Spectator", tr:"Seyirci"}, {en:"Defeat", tr:"Yenmek"}, {en:"Success", tr:"Başarı"}, {en:"Pitch", tr:"Saha"}, {en:"Medal", tr:"Madalya"}, {en:"Injury", tr:"Sakatlık"}, {en:"Train", tr:"Antrenman yapmak"}, {en:"Racket", tr:"Raket"}, {en:"Referee", tr:"Hakem"}] },
+        3: { desc: "Past events, life stories and achievements.", words: [{en:"Grow up", tr:"Büyümek"}, {en:"Raise", tr:"Yetiştirmek"}, {en:"Move", tr:"Taşınmak"}, {en:"Graduate", tr:"Mezun olmak"}, {en:"Award", tr:"Ödül"}, {en:"Brilliant", tr:"Zeki"}, {en:"Discover", tr:"Keşfetmek"}, {en:"Invent", tr:"İcat etmek"}, {en:"Scholarship", tr:"Burs"}, {en:"Die", tr:"Ölmek"}, {en:"Own", tr:"Sahip olmak"}, {en:"Produce", tr:"Üretmek"}, {en:"Evolve", tr:"Gelişmek"}] },
+        4: { desc: "Habitats, wild animals and nature.", words: [{en:"Habitat", tr:"Yaşam alanı"}, {en:"Extinct", tr:"Nesli tükenmiş"}, {en:"Hunt", tr:"Avlanmak"}, {en:"Prey", tr:"Av"}, {en:"Mammal", tr:"Memeli"}, {en:"Reptile", tr:"Sürüngen"}, {en:"Cage", tr:"Kafes"}, {en:"Poisonous", tr:"Zehirli"}, {en:"Protect", tr:"Korumak"}, {en:"Survive", tr:"Hayatta kalmak"}, {en:"Carnivore", tr:"Etçil"}, {en:"Herbivore", tr:"Otçul"}, {en:"Jungle", tr:"Orman"}, {en:"Species", tr:"Tür"}] },
+        5: { desc: "TV programs, genres and preferences.", words: [{en:"Broadcast", tr:"Yayın"}, {en:"Commercial", tr:"Reklam"}, {en:"Channel", tr:"Kanal"}, {en:"Director", tr:"Yönetmen"}, {en:"Series", tr:"Dizi"}, {en:"Sitcom", tr:"Durum komedisi"}, {en:"Documentary", tr:"Belgesel"}, {en:"Couch potato", tr:"Televizyon bağımlısı"}, {en:"Recommend", tr:"Önermek"}, {en:"Informative", tr:"Bilgilendirici"}, {en:"Remote control", tr:"Uzaktan kumanda"}, {en:"Appear", tr:"Görünmek"}, {en:"Audience", tr:"İzleyici"}] },
+        6: { desc: "Parties, arrangements and requests.", words: [{en:"Beverage", tr:"İçecek"}, {en:"Guest", tr:"Misafir"}, {en:"Host", tr:"Ev sahibi"}, {en:"Invitation", tr:"Davetiye"}, {en:"Decorate", tr:"Süslemek"}, {en:"Wrap", tr:"Paketlemek"}, {en:"Throw a party", tr:"Parti vermek"}, {en:"Order", tr:"Sipariş vermek"}, {en:"Attend", tr:"Katılmak"}, {en:"Refuse", tr:"Reddetmek"}, {en:"Accept", tr:"Kabul etmek"}, {en:"Celebrate", tr:"Kutlamak"}, {en:"Dessert", tr:"Tatlı"}] },
+        7: { desc: "Future predictions, hopes and expectations.", words: [{en:"Predict", tr:"Tahmin etmek"}, {en:"Expect", tr:"Ummak"}, {en:"Imagine", tr:"Hayal etmek"}, {en:"Excellent", tr:"Mükemmel"}, {en:"Peaceful", tr:"Huzurlu"}, {en:"Career", tr:"Kariyer"}, {en:"University", tr:"Üniversite"}, {en:"Trick", tr:"Hile"}, {en:"Probably", tr:"Muhtemelen"}, {en:"Receive", tr:"Almak"}, {en:"Definite", tr:"Kesin"}, {en:"Guess", tr:"Tahmin etmek"}, {en:"Fortune", tr:"Talih"}] },
+        8: { desc: "City life, shops and public places.", words: [{en:"Bakery", tr:"Fırın"}, {en:"Chemist", tr:"Eczane"}, {en:"Municipality", tr:"Belediye"}, {en:"Department store", tr:"Büyük mağaza"}, {en:"Neighborhood", tr:"Mahalle"}, {en:"Buy", tr:"Satın almak"}, {en:"Report", tr:"Bildirmek"}, {en:"Art gallery", tr:"Sanat galerisi"}, {en:"Fire station", tr:"İtfaiye"}, {en:"Governorship", tr:"Valilik"}, {en:"Grocery", tr:"Bakkal"}, {en:"Post office", tr:"Postane"}, {en:"Purpose", tr:"Amaç"}] },
+        9: { desc: "Eco-friendly habits and saving the earth.", words: [{en:"Pollution", tr:"Kirlilik"}, {en:"Recycle", tr:"Geri dönüşüm"}, {en:"Global warming", tr:"Küresel ısınma"}, {en:"Deforestation", tr:"Ormansızlaşma"}, {en:"Pesticide", tr:"Tarım ilacı"}, {en:"Threaten", tr:"Tehdit etmek"}, {en:"Destroy", tr:"Yok etmek"}, {en:"Environment", tr:"Çevre"}, {en:"Garbage", tr:"Çöp"}, {en:"Reduce", tr:"Azaltmak"}, {en:"Renewable", tr:"Yenilenebilir"}, {en:"Waste", tr:"İsraf etmek"}] },
+        10:{ desc: "Solar system, space and exploration.", words: [{en:"Orbit", tr:"Yörünge"}, {en:"Solar system", tr:"Güneş sistemi"}, {en:"Planet", tr:"Gezegen"}, {en:"Gravity", tr:"Yerçekimi"}, {en:"Dwarf", tr:"Cüce"}, {en:"Satellite", tr:"Uydu"}, {en:"Surface", tr:"Yüzey"}, {en:"Telescope", tr:"Teleskop"}, {en:"Universe", tr:"Evren"}, {en:"Observe", tr:"Gözlemlemek"}, {en:"Meteor", tr:"Göktaşı"}, {en:"Evidence", tr:"Kanıt"}, {en:"Space shuttle", tr:"Uzay mekiği"}] }
     };
 
     let GAME_STATE = { 
         mode: '', unit: 1, theme: 'classic', device: 'pc', score: 0, scoreP1: 0, scoreP2: 0, 
         isBattleLocked: false, activeCount: 15, selectedEN: null, selectedTR: null, 
-        combo: 0, enData: null, trData: null 
+        combo: 0, enData: null, trData: null, isCheckingClusters: false 
     };
     let MINIGAME = { id: '' };
     
@@ -1305,7 +1315,7 @@
         const msgs = [
             "[SYSTEM]: Initializing Core Framework...", 
             "[SYSTEM]: Loading English Vocabulary Database...", 
-            "[SYSTEM]: Word Match Bug Fully Patched.", 
+            "[SYSTEM]: Candy Crush Combo Protocol Active.", 
             "[SYSTEM]: Integrating Domain Expansion Engine...", 
             "[WARN]: Security protocol bypassed by User.", 
             "[OK]: Environment ready. Let the games begin."
@@ -1465,6 +1475,7 @@
         VOLTAGE_STATE.isDragging = false;
         
         document.getElementById('domain-overlay').classList.remove('domain-active');
+        GAME_STATE.isCheckingClusters = false;
         
         showScreen('main-menu');
     }
@@ -1540,6 +1551,7 @@
             GAME_STATE.combo = 0; 
             GAME_STATE.selectedEN = null; 
             GAME_STATE.selectedTR = null;
+            GAME_STATE.isCheckingClusters = false;
             
             // ==========================================
             // BUG FİX: KELİMELERİ BİR KERE SEÇİP KOPYALIYORUZ
@@ -1569,6 +1581,9 @@
             renderGrid('en-grid', 'en'); 
             renderGrid('tr-grid', 'tr');
             
+            // Oyun başladığında tahtadaki otomatik eşleşmeleri kontrol et
+            setTimeout(checkColorClusters, 500);
+            
         } else if (GAME_STATE.mode === 'quiz') {
             let sel = [...uWords].sort(()=>Math.random()-0.5).slice(0, 10);
             QUIZ_STATE.questions = sel.map(w => { 
@@ -1595,7 +1610,7 @@
     }
 
     /* ========================================
-       WORD MATCH MOTORU (DOMAIN EXPANSION DESTEKLİ)
+       WORD MATCH MOTORU (CANDY CRUSH & DOMAIN EXPANSION)
        ======================================== */
     function renderGrid(id, type) { 
         const c = document.getElementById(id); 
@@ -1625,7 +1640,115 @@
         }); 
     }
 
+    // CANDY CRUSH MEKANİĞİ: Renkleri kontrol et (3'lü, 4'lü, L vb.)
+    function checkColorClusters() {
+        if (GAME_STATE.mode !== 'wordmatch' || GAME_STATE.activeCount <= 0) {
+            GAME_STATE.isCheckingClusters = false;
+            return;
+        }
+        
+        GAME_STATE.isCheckingClusters = true;
+        let grid = GAME_STATE.enData;
+        if(!grid) {
+            GAME_STATE.isCheckingClusters = false;
+            return;
+        }
+        
+        let visited = new Set();
+        let clusters = [];
+
+        // Grid üzerinde komşuları bulma fonksiyonu (3x5 Grid)
+        function getNeighbors(i) {
+            let n = [];
+            let r = Math.floor(i/3); let c = i%3;
+            if(r > 0) n.push((r-1)*3 + c); // Üst
+            if(r < 4) n.push((r+1)*3 + c); // Alt
+            if(c > 0) n.push(r*3 + c - 1); // Sol
+            if(c < 2) n.push(r*3 + c + 1); // Sağ
+            return n;
+        }
+
+        // BFS (Genişlik Öncelikli Arama) ile bitişik aynı renkleri grupla
+        for(let i = 0; i < 15; i++) {
+            if(!grid[i] || visited.has(i)) continue;
+            let color = grid[i].color;
+            
+            let queue = [i];
+            let comp = [];
+            visited.add(i);
+
+            while(queue.length > 0) {
+                let curr = queue.shift();
+                comp.push(curr);
+                let neighbors = getNeighbors(curr);
+                for(let neighbor of neighbors) {
+                    if(grid[neighbor] && !visited.has(neighbor) && grid[neighbor].color === color) {
+                        visited.add(neighbor);
+                        queue.push(neighbor);
+                    }
+                }
+            }
+            
+            // Eğer aynı renkten 3 veya daha fazla blok yan yanaysa bu bir kümedir.
+            if(comp.length >= 3) {
+                clusters.push(comp);
+            }
+        }
+
+        if(clusters.length > 0) {
+            let totalBonus = 0;
+            let maxPts = 0;
+            
+            clusters.forEach(comp => {
+                let pts = 0;
+                if(comp.length === 3) pts = 200;
+                else if(comp.length === 4) pts = 300; // ■ Kare veya 4'lü Düz Çizgi
+                else if(comp.length >= 5) pts = 500;  // L-Şekli, 5'li Düz veya daha büyük kütle
+                
+                totalBonus += pts;
+                if(pts > maxPts) maxPts = pts;
+                
+                // Görsel Efekt ve Renk Değişimi
+                comp.forEach(idx => {
+                    let tileEl = document.querySelector(`.tile[data-type='en'][data-index='${idx}']`);
+                    if(tileEl) tileEl.classList.add('crush-anim'); // Animasyonu başlat
+                    
+                    if(grid[idx]) {
+                        // Aynı rengin tekrar denk gelmesini engellemek için yeni rastgele renk
+                        let newColor = Math.floor(Math.random()*4);
+                        if(newColor === grid[idx].color) newColor = (newColor + 1) % 4; 
+                        grid[idx].color = newColor;
+                    }
+                });
+            });
+            
+            GAME_STATE.score += totalBonus;
+            addXP(Math.floor(totalBonus/5)); 
+            updateWMUI();
+            playSound('bonus');
+            
+            let msg = "";
+            if(maxPts >= 500) msg = "MEGA COLOR MATCH! +500";
+            else if(maxPts === 300) msg = "SUPER COLOR MATCH! +300";
+            else msg = "COLOR MATCH! +" + totalBonus;
+            showToast(msg);
+            
+            // Animasyon bittikten sonra tekrar kontrol et (Zincirleme Kombo Mekaniği)
+            setTimeout(() => {
+                renderGrid('en-grid', 'en');
+                GAME_STATE.isCheckingClusters = false;
+                checkColorClusters(); 
+            }, 600);
+        } else {
+            // Eşleşecek renk kalmadı, kilidi aç.
+            GAME_STATE.isCheckingClusters = false;
+        }
+    }
+
     function onTileClick(t) { 
+        // Kombosu sırasında (Candy Crush mekaniği işlerken) tıklamayı engelle
+        if(GAME_STATE.isCheckingClusters) return;
+        
         if(t.dataset.type === 'en') {
             if(GAME_STATE.selectedEN) GAME_STATE.selectedEN.classList.remove('active-sel');
             GAME_STATE.selectedEN = t;
@@ -1655,21 +1778,19 @@
             showFeedback(GAME_STATE.combo + " COMBO!", "correct-flash");
 
             // ==========================================
-            // BONUS: YANYANA VEYA L ŞEKLİNDE EŞLEŞME (Takım oyunu için)
+            // BONUS: YANYANA VEYA L ŞEKLİNDE EŞLEŞME (Fiziksel konum bonusu - Eski mekanik)
             // ==========================================
             let eIdx = parseInt(e.dataset.index);
             let tIdx = parseInt(t.dataset.index);
             let eRow = Math.floor(eIdx/3); let eCol = eIdx%3;
             let tRow = Math.floor(tIdx/3); let tCol = tIdx%3;
 
-            // Eğer aynı satırdalarsa (yanyana) veya aynı sütundalarsa (alt alta)
             if (eRow === tRow || eCol === tCol) {
                 GAME_STATE.score += 50;
                 addXP(50);
                 playSound('bonus');
                 showToast("LINE BONUS!");
             }
-            // L şeklinde (1 satır 2 sütun veya 2 satır 1 sütun fark varsa)
             else if ( (Math.abs(eRow-tRow)===1 && Math.abs(eCol-tCol)===2) || (Math.abs(eRow-tRow)===2 && Math.abs(eCol-tCol)===1) ) {
                 GAME_STATE.score += 50;
                 addXP(50);
@@ -1682,13 +1803,13 @@
             // ==========================================
             if(GAME_STATE.combo === 5) {
                 triggerDomainExpansion();
-                GAME_STATE.combo = 0; // Trigger olduktan sonra sıfırla
+                GAME_STATE.combo = 0; 
             }
             
             removeTilesWM(e, t);
         } else {
             // YANLIŞ EŞLEŞME
-            GAME_STATE.combo = 0; // Hata yaparsa combo sıfırlanır
+            GAME_STATE.combo = 0; 
             playSound('wrong'); 
             showFeedback("YANLIŞ!", "wrong-flash");
             
@@ -1720,6 +1841,9 @@
             
             if(GAME_STATE.activeCount <= 0) {
                 triggerFinal(false);
+            } else {
+                // Taşlar düştükten sonra otomatik Candy Crush mekaniğini kontrol et
+                setTimeout(checkColorClusters, 300);
             }
         }, 400); 
     }
@@ -1770,7 +1894,6 @@
             dSub = "IDLE DEATH GAMBLE"; 
             dColor = "#f59e0b";
         } else {
-            // Normal temalarda (Classic, CS2) Domain açılmaz. Sadece 5 combo XP'si verilir.
             addXP(200);
             showToast("MEGA COMBO!");
             return;
@@ -1782,15 +1905,12 @@
         document.getElementById('domain-text').innerText = dText;
         document.getElementById('domain-sub').innerText = dSub;
         
-        // CSS Variable'ı anime rengine göre güncelle
         overlay.style.setProperty('--accent', dColor);
         
-        // Animasyonu resetle ve başlat
         overlay.classList.remove('domain-active');
         void overlay.offsetWidth; 
         overlay.classList.add('domain-active');
         
-        // Tahtadaki 3 rastgele çifti parlatma fonksiyonunu çağır
         highlightDomainPairs();
     }
 
@@ -1800,32 +1920,26 @@
             if(w) remainingPairs.push(w.pair); 
         });
         
-        // Geriye kalanları karıştır
         remainingPairs.sort(() => Math.random() - 0.5);
         
-        // Max 3 tane al (Eğer tahtada 3'ten az kelime kaldıysa olanı alır)
         let selectedPairs = remainingPairs.slice(0, 3);
         
-        // Önceden belirlediğimiz Neon Renk Sınıfları
-        let glowClasses = ['glow-pair-1', 'glow-pair-2', 'glow-pair-3']; // Yeşil, Sarı, Pembe
+        let glowClasses = ['glow-pair-1', 'glow-pair-2', 'glow-pair-3']; 
         
         selectedPairs.forEach((pair, index) => {
-            // İlgili kelime objelerini bul
             let enItem = GAME_STATE.enData.find(w => w && w.pair === pair);
             let trItem = GAME_STATE.trData.find(w => w && w.pair === pair);
             
-            // Objelere glow class'ı ekle
             if(enItem) enItem.glow = glowClasses[index];
             if(trItem) trItem.glow = glowClasses[index];
         });
         
-        // Tahtayı yeni neon efektleriyle tekrar renderla
         renderGrid('en-grid', 'en');
         renderGrid('tr-grid', 'tr');
     }
 
     /* ========================================
-       KLASİK MİNİGAMELERİN TAM MANTIĞI (6 ADET KALDI)
+       KLASİK MİNİGAMELERİN TAM MANTIĞI 
        ======================================== */
 
     function loadQuizQuestion() { 
@@ -2140,7 +2254,6 @@
         document.getElementById('mem-moves-ui').innerText = MEMORY_STATE.moves;
 
         if (MEMORY_STATE.firstCard.dataset.pair === MEMORY_STATE.secondCard.dataset.pair && MEMORY_STATE.firstCard.dataset.type !== MEMORY_STATE.secondCard.dataset.type) {
-            // Eşleşme doğru
             setTimeout(() => {
                 MEMORY_STATE.firstCard.classList.add('matched');
                 MEMORY_STATE.secondCard.classList.add('matched');
@@ -2156,7 +2269,6 @@
                 }
             }, 600);
         } else {
-            // Eşleşme yanlış
             setTimeout(() => {
                 MEMORY_STATE.firstCard.classList.remove('flipped');
                 MEMORY_STATE.secondCard.classList.remove('flipped');
@@ -2189,7 +2301,6 @@
             RAIN_STATE.targetWord = targetQ.en;
             document.getElementById('rain-target-ui').innerText = targetQ.tr;
             
-            // Yağacak kelimeler: 1 doğru, gerisi yanlış
             let options = [targetQ.en];
             while(options.length < 3) {
                 let r = pool[Math.floor(Math.random()*pool.length)].en;
@@ -2260,13 +2371,11 @@
             
             document.getElementById('v-start-node').innerText = q.en;
             
-            // Hedefi rastgele bir yere koy (yukarı veya aşağı)
             let endNode = document.getElementById('v-end-node');
             let isUp = Math.random() > 0.5;
             endNode.style.top = isUp ? "20%" : "70%";
-            endNode.innerText = q.tr; // Aslında hedefin türkçesini göstermiyoruz ama mantık için koyalım
+            endNode.innerText = q.tr;
             
-            // Yanıltıcı seçenekler ekleyebilirsin, basitlik için tek hedef yapıldı.
             setupVoltageWire();
         }
         
@@ -2321,7 +2430,6 @@
             let distToTarget = Math.sqrt(Math.pow(pos.x - endX, 2) + Math.pow(pos.y - endY, 2));
             
             if(distToTarget < 60) {
-                // Doğru bağlandı
                 playSound('correct');
                 wire.classList.add('v-active-wire');
                 area.classList.add('zap-effect');
@@ -2329,9 +2437,8 @@
                 GAME_STATE.score += 150;
                 addXP(50);
                 VOLTAGE_STATE.currentQ++;
-                setTimeout(() => startVoltageCut(MASTER_DICT[GAME_STATE.unit].words, []), 1000); // Reload Q
+                setTimeout(() => startVoltageCut(MASTER_DICT[GAME_STATE.unit].words, []), 1000); 
             } else {
-                // Koptu
                 playSound('wrong');
                 wire.style.width = '0px';
                 wire.style.background = 'var(--danger)';
@@ -2366,7 +2473,7 @@
             
             for(let i=0; i<3; i++) {
                 let c = document.getElementById(`crate-${i}`);
-                c.className = 'crate'; // Reset
+                c.className = 'crate'; 
                 document.getElementById(`cq-${i}`).innerText = opts[i];
                 if(opts[i] === q.tr) CRATE_STATE.correctIdx = i;
             }
@@ -2392,7 +2499,7 @@
                 addXP(100);
                 setTimeout(() => {
                     CRATE_STATE.currentQ++;
-                    startCrateBreaker(MASTER_DICT[GAME_STATE.unit].words, []); // Reload
+                    startCrateBreaker(MASTER_DICT[GAME_STATE.unit].words, []); 
                 }, 1000);
             }
         } else {
@@ -2438,7 +2545,6 @@
         s.style.display = 'flex';
     }
 
-    // Sistemin Matrix modunda başlaması
     window.onload = () => { playIntro(); };
 </script>
 </body>
