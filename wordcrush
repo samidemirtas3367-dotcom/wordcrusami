@@ -988,7 +988,7 @@
     </div>
 </div>
 
-<div class="dev-trigger" onclick="toggleConsole()">v3.6.0_candy_crush_combo_build(1500)</div>
+<div class="dev-trigger" onclick="toggleConsole()">v3.7.0_chain_reaction_build(1600)</div>
 
 <div id="main-menu" class="screen">
     <div class="menu-header">
@@ -1065,7 +1065,7 @@
         <button class="mod-btn" id="btn-dev-pc" onclick="setDevice('pc')">💻 PC</button>
         <button class="mod-btn" id="btn-dev-tahta" onclick="setDevice('tahta')">🏫 Akıllı Tahta</button>
     </div>
-    <div id="device-info" class="info-box">MEGA UPDATE V3.6: CANDY CRUSH MEKANİĞİ EKLENDİ! Renkleri eşleştir 200, 300, 500 bonus kazan! DOMAIN EXPANSION SİSTEMİ AKTİF! 5 COMBO YAP VE ŞOVU İZLE!</div>
+    <div id="device-info" class="info-box">MEGA UPDATE V3.7: ZİNCİRLEME COMBO (CHAIN REACTION) EKLENDİ! Art arda %45 şansla bonus kombolar otomatik patlar!</div>
     <button class="big-btn back-btn" onclick="showScreen('main-menu')">GERİ DÖN</button>
 </div>
 
@@ -1235,7 +1235,8 @@
     let GAME_STATE = { 
         mode: '', unit: 1, theme: 'classic', device: 'pc', score: 0, scoreP1: 0, scoreP2: 0, 
         isBattleLocked: false, activeCount: 15, selectedEN: null, selectedTR: null, 
-        combo: 0, enData: null, trData: null, isCheckingClusters: false 
+        combo: 0, enData: null, trData: null, isCheckingClusters: false, 
+        chainChance: 0.45 // %45 Zincirleme çıkma şansı
     };
     let MINIGAME = { id: '' };
     
@@ -1265,7 +1266,7 @@
     let RANK_STATE = { xp: 0, level: 0 };
 
     function addXP(amount) {
-        if(RANK_STATE.level >= RANKS.length - 1) return; // Zirvedesin kral
+        if(RANK_STATE.level >= RANKS.length - 1) return; 
         RANK_STATE.xp += amount;
         
         let nextRank = RANKS[RANK_STATE.level + 1];
@@ -1315,8 +1316,8 @@
         const msgs = [
             "[SYSTEM]: Initializing Core Framework...", 
             "[SYSTEM]: Loading English Vocabulary Database...", 
-            "[SYSTEM]: Candy Crush Combo Protocol Active.", 
-            "[SYSTEM]: Integrating Domain Expansion Engine...", 
+            "[SYSTEM]: Candy Crush Chain Reaction Engine Enabled (45%).", 
+            "[SYSTEM]: Integrating Domain Expansion...", 
             "[WARN]: Security protocol bypassed by User.", 
             "[OK]: Environment ready. Let the games begin."
         ];
@@ -1373,12 +1374,22 @@
         let args = cmd.split(' '); let c = args[0].toLowerCase();
         if(c === '/help') {
             printConsole("--- COMMAND LIST ---", "sys-msg");
-            printConsole("set_gravity <val> : Word Rain hızını değiştirir", "sys-msg");
-            printConsole("add_time <sec>    : Bomb Defuse moduna süre ekler", "sys-msg");
-            printConsole("matrix_mode       : Temayı kod akışına çevirir", "sys-msg");
-            printConsole("set_rank <level>  : Rütbeyi hileyle zorlar (0-5)", "sys-msg");
-            printConsole("clear             : Konsolu temizler", "sys-msg");
-            printConsole("exit              : Konsolu kapatır", "sys-msg");
+            printConsole("set_gravity <val>    : Word Rain hızını değiştirir", "sys-msg");
+            printConsole("add_time <sec>       : Bomb Defuse moduna süre ekler", "sys-msg");
+            printConsole("set_chain_chance <%> : Arda arda bonus patlama şansını ayarlar (Örn: 45 veya 0.45)", "sys-msg");
+            printConsole("matrix_mode          : Temayı kod akışına çevirir", "sys-msg");
+            printConsole("set_rank <level>     : Rütbeyi hileyle zorlar (0-5)", "sys-msg");
+            printConsole("clear                : Konsolu temizler", "sys-msg");
+            printConsole("exit                 : Konsolu kapatır", "sys-msg");
+        } else if(c === 'set_chain_chance') {
+            let val = parseFloat(args[1]);
+            if(!isNaN(val)) {
+                if(val > 1) val = val / 100; // 45 girilirse 0.45 yapar
+                GAME_STATE.chainChance = val;
+                printConsole(`Chain bonus chance set to ${val * 100}%`, "success-msg");
+            } else {
+                printConsole("Invalid percentage value.", "err-msg");
+            }
         } else if(c === 'set_gravity') {
             RAIN_STATE.speedMod = parseFloat(args[1]) || 1; printConsole(`Gravity set to ${RAIN_STATE.speedMod}`, "success-msg");
         } else if(c === 'add_time') {
@@ -1553,25 +1564,17 @@
             GAME_STATE.selectedTR = null;
             GAME_STATE.isCheckingClusters = false;
             
-            // ==========================================
-            // BUG FİX: KELİMELERİ BİR KERE SEÇİP KOPYALIYORUZ
-            // Böylece İngilizce tarafında hangi kelime varsa,
-            // Türkçe tarafında da %100 o kelimenin eşi olacak.
-            // ==========================================
             let safePool = [...uWords].sort(()=>Math.random()-0.5).slice(0, 15);
             
-            // Eğer ünitede 15 kelime yoksa aWords'ten takviye yap
             while(safePool.length < 15) {
                 let r = aWords[Math.floor(Math.random()*aWords.length)];
                 if(!safePool.find(x => x.en === r.en)) safePool.push(r);
             }
             
-            // İngilizce Verisi (Renkleri Rastgele Atanıyor)
             GAME_STATE.enData = safePool.map(w => ({ 
                 en: w.en, tr: w.tr, pair: w.en, color: Math.floor(Math.random()*4), glow: null 
             }));
             
-            // Türkçe Verisi (İngilizce verisinin aynısı, sadece karıştırılmış)
             GAME_STATE.trData = [...safePool].sort(()=>Math.random()-0.5).map(w => ({ 
                 en: w.en, tr: w.tr, pair: w.en, color: 'tr', glow: null 
             }));
@@ -1581,7 +1584,6 @@
             renderGrid('en-grid', 'en'); 
             renderGrid('tr-grid', 'tr');
             
-            // Oyun başladığında tahtadaki otomatik eşleşmeleri kontrol et
             setTimeout(checkColorClusters, 500);
             
         } else if (GAME_STATE.mode === 'quiz') {
@@ -1629,7 +1631,6 @@
             
             d.className = `tile ${type === 'tr' ? 'tr-tile' : 'c-' + w.color}`; 
             
-            // Eğer domain expansion efekti (glow) varsa ekle
             if(w.glow) d.classList.add(w.glow); 
             
             d.style.left = (col * 132 + 20) + "px"; 
@@ -1640,7 +1641,6 @@
         }); 
     }
 
-    // CANDY CRUSH MEKANİĞİ: Renkleri kontrol et (3'lü, 4'lü, L vb.)
     function checkColorClusters() {
         if (GAME_STATE.mode !== 'wordmatch' || GAME_STATE.activeCount <= 0) {
             GAME_STATE.isCheckingClusters = false;
@@ -1657,7 +1657,6 @@
         let visited = new Set();
         let clusters = [];
 
-        // Grid üzerinde komşuları bulma fonksiyonu (3x5 Grid)
         function getNeighbors(i) {
             let n = [];
             let r = Math.floor(i/3); let c = i%3;
@@ -1668,7 +1667,6 @@
             return n;
         }
 
-        // BFS (Genişlik Öncelikli Arama) ile bitişik aynı renkleri grupla
         for(let i = 0; i < 15; i++) {
             if(!grid[i] || visited.has(i)) continue;
             let color = grid[i].color;
@@ -1689,7 +1687,6 @@
                 }
             }
             
-            // Eğer aynı renkten 3 veya daha fazla blok yan yanaysa bu bir kümedir.
             if(comp.length >= 3) {
                 clusters.push(comp);
             }
@@ -1702,22 +1699,32 @@
             clusters.forEach(comp => {
                 let pts = 0;
                 if(comp.length === 3) pts = 200;
-                else if(comp.length === 4) pts = 300; // ■ Kare veya 4'lü Düz Çizgi
-                else if(comp.length >= 5) pts = 500;  // L-Şekli, 5'li Düz veya daha büyük kütle
+                else if(comp.length === 4) pts = 300; 
+                else if(comp.length >= 5) pts = 500;  
                 
                 totalBonus += pts;
                 if(pts > maxPts) maxPts = pts;
                 
-                // Görsel Efekt ve Renk Değişimi
+                // --- %45 ZİNCİRLEME (CHAIN) MANTIĞI BURADA ---
+                let oldColor = grid[comp[0]].color;
+                let isChain = Math.random() < GAME_STATE.chainChance;
+                let chainColor = Math.floor(Math.random() * 4);
+                if (chainColor === oldColor) chainColor = (chainColor + 1) % 4; // Eski renkle aynı olmasın
+                
                 comp.forEach(idx => {
                     let tileEl = document.querySelector(`.tile[data-type='en'][data-index='${idx}']`);
-                    if(tileEl) tileEl.classList.add('crush-anim'); // Animasyonu başlat
+                    if(tileEl) tileEl.classList.add('crush-anim'); 
                     
                     if(grid[idx]) {
-                        // Aynı rengin tekrar denk gelmesini engellemek için yeni rastgele renk
-                        let newColor = Math.floor(Math.random()*4);
-                        if(newColor === grid[idx].color) newColor = (newColor + 1) % 4; 
-                        grid[idx].color = newColor;
+                        if (isChain) {
+                            // Zincirleme bonus aktif: Hepsine aynı yeni rengi ver
+                            grid[idx].color = chainColor; 
+                        } else {
+                            // Zincirleme bonus pasif: Rastgele farklı renkler ver
+                            let newColor = Math.floor(Math.random()*4);
+                            if(newColor === oldColor) newColor = (newColor + 1) % 4; 
+                            grid[idx].color = newColor;
+                        }
                     }
                 });
             });
@@ -1733,20 +1740,17 @@
             else msg = "COLOR MATCH! +" + totalBonus;
             showToast(msg);
             
-            // Animasyon bittikten sonra tekrar kontrol et (Zincirleme Kombo Mekaniği)
             setTimeout(() => {
                 renderGrid('en-grid', 'en');
                 GAME_STATE.isCheckingClusters = false;
                 checkColorClusters(); 
             }, 600);
         } else {
-            // Eşleşecek renk kalmadı, kilidi aç.
             GAME_STATE.isCheckingClusters = false;
         }
     }
 
     function onTileClick(t) { 
-        // Kombosu sırasında (Candy Crush mekaniği işlerken) tıklamayı engelle
         if(GAME_STATE.isCheckingClusters) return;
         
         if(t.dataset.type === 'en') {
@@ -1769,7 +1773,6 @@
         let t = GAME_STATE.selectedTR; 
         
         if(e.dataset.pair === t.dataset.pair) {
-            // DOĞRU EŞLEŞME
             GAME_STATE.score += 100; 
             addXP(100); 
             GAME_STATE.combo++; 
@@ -1777,9 +1780,6 @@
             playSound('correct'); 
             showFeedback(GAME_STATE.combo + " COMBO!", "correct-flash");
 
-            // ==========================================
-            // BONUS: YANYANA VEYA L ŞEKLİNDE EŞLEŞME (Fiziksel konum bonusu - Eski mekanik)
-            // ==========================================
             let eIdx = parseInt(e.dataset.index);
             let tIdx = parseInt(t.dataset.index);
             let eRow = Math.floor(eIdx/3); let eCol = eIdx%3;
@@ -1798,9 +1798,6 @@
                 showToast("L-SHAPE BONUS!");
             }
             
-            // ==========================================
-            // DOMAIN EXPANSION TETİKLEYİCİ (5 COMBO)
-            // ==========================================
             if(GAME_STATE.combo === 5) {
                 triggerDomainExpansion();
                 GAME_STATE.combo = 0; 
@@ -1808,7 +1805,6 @@
             
             removeTilesWM(e, t);
         } else {
-            // YANLIŞ EŞLEŞME
             GAME_STATE.combo = 0; 
             playSound('wrong'); 
             showFeedback("YANLIŞ!", "wrong-flash");
@@ -1842,7 +1838,6 @@
             if(GAME_STATE.activeCount <= 0) {
                 triggerFinal(false);
             } else {
-                // Taşlar düştükten sonra otomatik Candy Crush mekaniğini kontrol et
                 setTimeout(checkColorClusters, 300);
             }
         }, 400); 
